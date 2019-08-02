@@ -1,0 +1,21 @@
+{
+    "0.2.5": [
+        {
+            "title": "database",
+            "version": "0.1.0",
+            "description": [
+                "Edit the database of your game in a dynamic way",
+                "Beta version"
+            ]
+        },
+
+        {
+            "title": "todo",
+            "version": "0.1.0",
+            "description": [
+                "Simple to-do app to let your game more organized",
+                "Beta version"
+            ]
+        }
+    ]
+}
