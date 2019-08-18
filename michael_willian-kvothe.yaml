@@ -1,0 +1,47 @@
+# @Michael Willian
+# https://github.com/nodeca/js-yaml
+# To test online: http://nodeca.github.io/js-yaml/
+# * =========================================================================
+# * [author]
+# * =========================================================================
+author: 
+  name: Michael Willian @kvothe 
+  profile: https://avatars1.githubusercontent.com/u/6865744?s=460&v=4
+  description: >
+    Hello, I'm the developer of this app. Welcome to my page!
+    Here you can find extensions for this app and plugins for your project.
+  website: https://daxsoft.github.io/
+  email: dax-soft@live.com
+# * =========================================================================
+# * [plugins]
+# * =========================================================================
+# [:ulse]
+$-ulse: 
+  name: Ultimate Sensor Event 
+  version: 1.7.0
+  requirement: []
+  description: >
+    <p>
+      You can use this plugin to make the npc detect the presence of the player or another npc!
+      Useful in the creation of stealth elements, in which the player must keep his presence hidden to advance.
+    </p>
+    <hr>
+    <div class='winfo-content'>
+      <img 
+        src='https://dax-soft.weebly.com/uploads/1/5/7/2/15724724/0ssa.png' 
+        alt='ulse-picture'
+        style="width: 80%; object-fit: cover; display: block;">
+    </div>
+  files: [
+    {
+      typeof: js,
+      filename: ulse.js,
+      folder: 'js/plugins/',
+      description: "Stable version"
+    }
+  ]
+
+
+# * =========================================================================
+# * [EXTENSION]
+# * =========================================================================
