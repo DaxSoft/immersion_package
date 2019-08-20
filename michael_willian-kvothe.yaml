@@ -36,8 +36,11 @@ $-ulse:
     {
       typeof: js,
       filename: ulse.js,
-      folder: 'js/plugins/',
-      description: "Stable version"
+      route: 'plugins',
+      description: "Stable version",
+      url: 'https://raw.githubusercontent.com/DaxSoft/JavaScript/master/ulse.js',
+      replace: false,
+      optional: false
     }
   ]
 
