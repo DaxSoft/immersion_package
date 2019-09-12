@@ -1,0 +1,77 @@
+{
+    "step": {
+        "micro": 0.1,
+        "normal": 1,
+        "macro": 10
+    },
+
+    "eOptions": [{
+        "label": "Light",
+        "value": 1,
+        "control": "light",
+        "icon": "light-bulb.png"
+    }, {
+        "label": "Particles",
+        "value": 2,
+        "control": "particle",
+        "icon": "particle.png"
+    }, {
+        "label": "Collisions",
+        "value": 3,
+        "control": "collision",
+        "icon": "collision.png"
+    }, {
+        "label": "Sounds",
+        "value": 4,
+        "control": "sound",
+        "icon": "audio.png"
+    }, {
+        "label": "Weather",
+        "value": 5,
+        "control": "weather",
+        "icon": "weather.png"
+    }, {
+        "label": "Sprite",
+        "value": 6,
+        "control": "sprite",
+        "icon": "box.png"
+    }, {
+        "label": "Options",
+        "value": 7,
+        "control": "option",
+        "icon": "json.png"
+    }, {
+        "label": "Save",
+        "value": 8,
+        "control": "save",
+        "icon": "save.png"
+    }],
+
+    "periodTime": [{
+        "label": "dawn",
+        "value": 0
+    }, {
+        "label": "morning",
+        "value": 1
+    }, {
+        "label": "afternoon",
+        "value": 2
+    }, {
+        "label": "night",
+        "value": 3
+    }, {
+        "label": "all",
+        "value": 4
+    }],
+
+    "floor": [{
+        "label": "under",
+        "value": 0
+    }, {
+        "label": "base",
+        "value": 1
+    }, {
+        "label": "high",
+        "value": 2
+    }]
+}
