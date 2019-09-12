@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<setup>
+<execute>
+    <author>default</author>
+    <name>Game Switches</name>
+    <description>Turn true or false the specific gameSwitches</description>
+    <regexp>^gswitch\s?(\d+)\s?(\w+)</regexp>
+    <script>
+        $gameSwitches.setValue(Number(arguments[1]), Haya.Utils.isBoolean(arguments[2]))
+    </script>
+</execute>
+<execute>
+    <author>default</author>
+    <name>Game Variables</name>
+    <description>Change the value of a game varaible ID</description>
+    <regexp>^gvariable\s?(\d+)\s?(\d+)</regexp>
+    <script>
+        $gameVariables.setValue(Number(arguments[1]), parseInt(arguments[2]))
+    </script>
+</execute>
+<execute>
+    <author>default</author>
+    <name>Don't move</name>
+    <description>If NPC is moving with any type, removes</description>
+    <regexp>^(not|don't)\s?move</regexp>
+    <script>
+        this._moveType = 0;
+    </script>
+</execute>
+<execute>
+    <author>default</author>
+    <name>Pathfind</name>
+    <description>NPC find the path to X Y location</description>
+    <regexp>^(path\s?to|pathfind)\s?(\d+)x\s?(\d+)y\s?(\d+)d</regexp>
+    <script>
+        this.pathfindTo(parseInt(@[2]), parseInt(@[3]), parseInt(@[4]));
+    </script>
+</execute>
+<execute>
+    <author>default</author>
+    <name>Transfer</name>
+    <description>Transfer the NPC to another map. The NPC will find the path to the location</description>
+    <regexp>^(transfer|go)\s?(\d+)\s(\d+)</regexp>
+    <script>
+        this.transferTo(parseInt(@[2]), parseInt(@[3]));
+    </script>
+</execute>
+</setup>

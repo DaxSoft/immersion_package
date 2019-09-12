@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- -->
+<dialogue>
+    <!-- General dialogue -->
+    <main>
+        <npc>I'm only doing my work here</npc>
+        <npc>Don't</npc>
+    </main>
+</dialogue>

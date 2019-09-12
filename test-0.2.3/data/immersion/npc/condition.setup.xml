@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<setup>
+<!-- :game -->
+<condition>
+    <author>default</author>
+    <name>Game Switches</name>
+    <description> Check out if ID game switch is true or false</description>
+    <regexp>^gswitch\s?(\d+)\s?(\w+)</regexp>
+    <script>
+        return ($gameSwitches.value(Number(arguments[1])) === Haya.Utils.isBoolean(arguments[2]));
+    </script>
+</condition>
+<condition>
+    <author>default</author>
+    <name>Game Variables</name>
+    <description>Check out if ID game variable is with X value</description>
+    <regexp>^gvariable\s?(\d+)\s?(\d+)</regexp>
+    <script>
+        return ($gameVariables.value(Number(arguments[1]) === parseInt(arguments[2]));
+    </script>
+</condition>
+<condition>
+    <author>default</author>
+    <name>Location</name>
+    <description>Check out if npc is at location</description>
+    <regexp>^(npc)(\s?at)?\s?(\d+)x\s?(\d+)y</regexp>
+    <script>
+       this.pos( parseInt(@[3]), parseInt(@[4]) );
+    </script>
+</condition>
+<!-- :behavior -->
+<condition>
+    <author>default</author>
+    <name>Period of Time</name>
+    <description>Check out the period of time</description>
+    <regexp>^time\s?(is)?\s?(\w+)</regexp>
+    <script>
+        $.Time.period(@[2]);
+    </script>
+</condition>
+<condition>
+    <author>default</author>
+    <name>Specific Time</name>
+    <description>Check out specific time towards the day</description>
+    <regexp>^(.+)?\s?time\s?at\s?(\d+)\:(\d+)\:(\d+)</regexp>
+    <script>
+        $.Time.at(@[2], @[3], @[4], @[1]);
+    </script>
+</condition>
+<condition>
+    <author>default</author>
+    <name>Specific Date</name>
+    <description>Check out specific date. Day, Month, Year</description>
+    <regexp>^(.+)?\s?date\s?at\s?(\d+)\/(\d+)\/(\d+)</regexp>
+    <script>
+        $.Time.date(@[2], @[3], @[4], @[1]);
+    </script>
+</condition>
+<condition>
+    <author>default</author>
+    <name>Near of</name>
+    <description>Check out how is near toward this NPC</description>
+    <regexp>^(near|closer)\s?(of)?\s?(\w+)</regexp>
+    <script>
+        this.nearOf(@[3]);
+    </script>
+</condition>
+</setup>

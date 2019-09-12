@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dialogue>
+<!-- [TAG:GAME] ======================================================= -->
+    <game>
+        <regexp>\:gv(ar|ariable)?\s?(\d+)\:</regexp>
+        <script>String($gameVariables.value(parseInt(@[2])));</script>
+    </game>
+<!-- [TAG:PLAYER] ===================================================== -->
+    <player>
+        <regexp>\:p(name|n)\:</regexp>
+        <script>(String($gameParty.members()[0].name()));</script>
+    </player>
+    <player>
+        <regexp>\:p(gold|$)\:</regexp>
+        <script>(String($gameParty.gold()));</script>
+    </player>
+    <player>
+        <regexp>\:p(nickname|nick)\:</regexp>
+        <script>(String($gameParty.members()[0].nickname()));</script>
+    </player>
+<!-- [TAG:NPC] ======================================================== -->
+    <npc>
+        <regexp>\:n(name|n)\:</regexp>
+        <script>String($gameSystem.npc(data.id).general.name);</script>
+    </npc>
+    <npc>
+        <regexp>\:felling\:</regexp>
+        <script>String(":" + data._behavior.felling + ":");</script>
+    </npc>
+    <npc>
+        <regexp>\:g(npc|$):</regexp>
+        <script>(String($gameSystem.npc(data.id).general.gold))</script>
+    </npc>
+    <npc>
+        <regexp>\:nnick\:</regexp>
+        <script>(String($gameSystem.npc(data.id).general.nickname));</script>
+    </npc>
+    <npc>
+        <regexp>\:adjective-(mood|felling)\:</regexp>
+        <script>$.dialogue.adjective(data.mood());</script>
+    </npc>
+<!-- [LIBRARY] ====================================================== -->
+<library>
+<!-- [ADJECTIVE] ====================================================== -->
+    <!-- Good Adjective | Split by break line -->
+    <gadj>
+        amazing
+        beutiful
+    </gadj>
+    <!-- Bad Adjective | Split by break line -->
+    <badj>
+        terrible
+        bad
+    </badj>
+<!-- [PRE-SET PHRASES] ================================================ -->
+    <!-- ecstasy pre-set phrases | Split by break line -->
+    <ecstasy>
+        This day is really a beutiful day!
+        I'm in ecstasy.
+    </ecstasy>
+    <!-- amazement pre-set phrases | Split by break line -->
+    <amazement>
+        I think that I'll have a greay day today!
+        I'm wonderful haha.
+    </amazement>
+    <!-- admiration pre-set phrases | Split by break line -->
+    <admiration>
+        What a beutiful day!
+        I'm an admirer of nature.
+    </admiration>
+    <!-- terror pre-set phrases | Split by break line -->
+    <terror>
+        I gonna die today! I gonna die!
+        I'm felling fear...
+    </terror>
+    <!-- rage pre-set phrases | Split by break line -->
+    <rage>
+        I gonna beat up everyone that across my path today!
+        I'm full of rage...
+    </rage>
+    <!-- vigilance pre-set phrases | Split by break line -->
+    <vigilance>
+        I think that someone is watching me!
+        I need to be vigilance...
+    </vigilance>
+    <!-- loathing pre-set phrases | Split by break line -->
+    <loathing>
+        Oh... what a shit day!
+        I'm loathe this day...
+    </loathing>
+    <!-- grief pre-set phrases | Split by break line -->
+    <grief>
+        Oh no... I don't have any money...
+        I'm sad...
+    </grief>
+</library>
+</dialogue>

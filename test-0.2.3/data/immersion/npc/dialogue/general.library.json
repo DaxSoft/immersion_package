@@ -1,0 +1,53 @@
+{
+    "adjective": {
+        "good": [
+            "amazing",
+            "beutiful"
+        ],
+
+        "bad": [
+            "terrible",
+            "bad"
+        ]
+    },
+
+    "ecstasy": [
+        "This day is really a beutiful day!",
+        "I'm in ecstasy!"
+    ],
+
+    "amazement": [
+        "I think that I'll have a greay day today!",
+        "I'm wonderful haha"
+    ],
+
+    "admiration": [
+        "What a beutiful sunlight!",
+        "I'm an admirer of nature"
+    ],
+
+    "terror": [
+        "I gonna die today! I gonna die!",
+        "I'm felling fear..."
+    ],
+
+    "rage": [
+        "I gonna beat up everyone that across my path today!",
+        "I'm full of rage..."
+    ],
+
+    "vigilance": [
+        "I think that someone is watching me!",
+        "I need to be vigilance..."
+    ],
+
+    "loathing": [
+        "Oh... what a shit day!",
+        "I'm loathe this day..."
+    ],
+
+    "grief": [
+        "Oh no... I don't have any money...",
+        "I'm sad..."
+    ]
+}

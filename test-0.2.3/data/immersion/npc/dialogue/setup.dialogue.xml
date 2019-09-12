@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dialogue>
+<!-- Game -->
+    <game>
+        <name>Game Variables</name>
+        <author>default</author>
+        <description>Display on message the value from a game variable</description>
+        <regex>\:(gvar|var)\[(\d+)\]\:</regex>
+        <script>
+            ($gameVariables.value(parseInt(@[1])));
+        </script>
+    </game>
+    <game>
+        <name>Gold</name>
+        <author>default</author>
+        <description>Display on message the current money of player</description>
+        <regex>\:(p|player)\s?(gold|money)\:</regex>
+        <script>
+            (String($gameParty.gold()));
+        </script>
+    </game>
+<!-- NPC -->
+    <npc>
+        
+    </npc>
+<!-- Player -->
+    <player>
+    </player>
+</dialogue>

@@ -1,0 +1,70 @@
+===========================================================================
+** Necessário usar 'tab character', ou, apenas dar tab. Em comandos com '!' e ':'
+---------------------------------------------------------------------------
+    npc "Fala"
+    player "Fala"
+    [name]: \\ cria um label para repitções
+    label -> name \\ vá para o label 'name'
+    label <- \\ cancela o label 'name', caso estiver nele. 
+---------------------------------------------------------------------------
+    $import base.txt // importa template arquivo 
+    $id Name_ID_MapID // identificador
+    :default // mensagem padrão 
+    :dawn // mensagem pela alvorada
+    :morning // mensagem pela manhã
+    :afternoon // mensagem pela tarde
+    :evening // mensagem pela noite
+    :midnight // mensagem pela meia noite 
+---------------------------------------------------------------------------
+    choice // escolhas
+        nome da escolha:
+            ....
+        cancel: // caso cancele a escolha 
+            ....
+---------------------------------------------------------------------------
+    condition ... : // condição global, o argumento 'condition' será checado por 'eval'
+        @ -> equivale ao local, no caso, npc.
+    if ... : // condição com formatação do script
+---------------------------------------------------------------------------
+    exec // executa um comando com a formatação do script
+        @ -> equivale ao local, no caso, npc.
+    js // executa um comando global com a formatação 'eval'.
+===========================================================================
+
+$id ID 
+
+:default
+    npc ":felling:\nTell me :pname:, how are you today?"
+    player "ookk.."
+    choice
+        Good:
+            player "I'm felling good today :)"
+        Normal:
+            player "I'm felling... nothing? :|"
+        Bad:
+            player "I'm felling bad today :("
+        Cancel:
+            npc "Hm..."
+    exec TESTE
+    [label]
+        player "this is a label" 
+        condition a === 1:
+            npc "ok"
+    condition test === true:
+        npc "inside of condition"
+    label <- label 
+
+:morning
+    npc "This morning is :adjective:\nDo you not think?"
+    choice
+        Yes:
+            condition @.message.last.adjective(0) is "good"
+                player "Yes, I'm think that this morning is :adjective-good:"
+                exec @.friend.player.value += 0.01
+            condition @.message.last.adjective(0) is "bad"
+                player "Yes, I'm think that this morning is really :adjective-bad:"
+                exec @.friend.player.value += 0.01
+        No:
+            player "No..."
+            exec @.friend.player.value -= 0.01
+        Cancel:
