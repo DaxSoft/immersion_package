@@ -27,7 +27,7 @@ The goal of the current test (0.2.3) is:
 
 #### To test
 
-To test, you first need to download the project, see on the header of this readme the most recent version of the 'test', then search for this 
+To test, you first need to download the project, see on the header of this readme the most recent version of the 'test', then search for his 
 folder and download it (or you can just download everthing).
 Or you can just download with the dropbox link (more easy)
 
