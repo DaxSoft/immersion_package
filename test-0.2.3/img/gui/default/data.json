@@ -1,0 +1,54 @@
+{
+    "config": {
+        "name": "haya-default-gui", 
+        "author": "dax-soft@live.com"
+    },
+
+    "button": {
+        "bg": { "default": "btn.default.png", "down": "btn.down.png" },
+        "font": {
+            "default": {
+                "fontFamily": "Consolas",
+                "fontSize": 14,
+                "fill": "white"
+            },
+
+            "block": {
+                "fontFamily": "Consolas",
+                "fontSize": 14,
+                "fill": "red"
+            }
+        },
+        "width": 96,
+        "height": 24,
+        "text": "button"
+    },
+
+    "checkbox": {
+        "bg": { "default": "radio.off.png", "down": "radion.on.png" },
+        "font": {
+            "default": {
+                "fontFamily": "Consolas",
+                "fontSize": 14,
+                "fill": "white"
+            },
+
+            "block": {
+                "fontFamily": "Consolas",
+                "fontSize": 14,
+                "fill": "red"
+            }
+        }
+    },
+
+    "information": {
+        "bg": "information.png",
+        "font": {
+            "fontFamily": "Consolas",
+            "fontSize": 12,
+            "fill": "white",
+            "wordWrap": true,
+            "wordWrapWidth": 350
+        }
+    }
+}
