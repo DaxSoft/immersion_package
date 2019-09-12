@@ -1,0 +1,68 @@
+{
+  "map": {},
+  "light": {
+    "default": {
+      "ambient 9": {
+        "position": [
+          0,
+          0
+        ],
+        "color": "0xddc83a",
+        "nature": "static",
+        "dirty": 0,
+        "brightness": 1,
+        "falloff": [
+          0.75,
+          3,
+          20
+        ],
+        "name": "ambient 9",
+        "kind": "ambient",
+        "time": "all",
+        "blendMode": 1,
+        "lightHeight": 0.1,
+        "pivot": [
+          0,
+          0
+        ],
+        "effect": {
+          "oscilant": {
+            "active": false,
+            "range": 0,
+            "speed": 0.2,
+            "value": 0,
+            "turn": false,
+            "falloff": []
+          }
+        }
+      }
+    }
+  },
+  "filters": {
+    "OldFilmFilter": {
+      "sepia": 0.3,
+      "noise": 0.3,
+      "noiseSize": 1.0,
+      "scratch": 0.5,
+      "scratchDensity": 0.3,
+      "scratchWidth": 1.0,
+      "vignetting": 0.3,
+      "vignettingAlpha": 1.0,
+      "vignettingBlur": 0.3
+    }
+  },
+  "filter-tag": [
+    {
+      "name": "Delete",
+      "value": ""
+    },
+    {
+      "name": "Time",
+      "value": "all"
+    },
+    {
+      "name": "Switch",
+      "value": "-1"
+    }
+  ]
+}

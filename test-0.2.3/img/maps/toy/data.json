@@ -1,0 +1,114 @@
+{
+    "light": {
+        "ambient 9": {
+            "position": [0, 0],
+            "switch": -1,
+            "color": "0xf39c12",
+            "nature": "static",
+            "dirty": 0,
+            "brightness": 0.75,
+            "falloff": [0.75, 3, 20],
+            "name": "Pixi_Light",
+            "kind": "ambient",
+            "time": "all",
+            "floor": "base",
+            "blendMode": 1,
+            "lightHeight": 0.1,
+            "pivot": [0, 0],
+            "pulse": {
+                "duration": 1,
+                "reverse": false,
+                "value": false,
+                "time": 60,
+                "speed": 0.1,
+                "min": 0.5,
+                "max": 1
+            },
+            "oscilation": {
+                "duration": 1,
+                "time": 60,
+                "speed": 0.1,
+                "value": false,
+                "min": 0.5,
+                "max": 1
+            }
+        },
+        "ambient 2": {
+            "position": [512, 512],
+            "switch": -1,
+            "color": "0x0a3d62",
+            "nature": "static",
+            "dirty": 0,
+            "brightness": 0.7,
+            "falloff": [0.75, 3, 20],
+            "name": "Pixi_Light",
+            "kind": "ambient",
+            "time": "all",
+            "floor": "under",
+            "blendMode": 1,
+            "lightHeight": 0.07,
+            "pivot": [0, 0],
+            "pulse": {
+                "duration": 1,
+                "reverse": false,
+                "value": false,
+                "time": 60,
+                "speed": 0.1,
+                "min": 0.35,
+                "max": 0.7
+            },
+            "oscilation": {
+                "duration": 1,
+                "time": 60,
+                "speed": 0.1,
+                "value": false,
+                "min": 0.35,
+                "max": 0.7
+            }
+        },
+        "ambient 3": {
+            "position": [512, 512],
+            "switch": -1,
+            "color": "0xe67e22",
+            "nature": "static",
+            "dirty": 0,
+            "brightness": 0.5,
+            "falloff": [0.75, 3, 20],
+            "name": "Pixi_Light",
+            "kind": "ambient",
+            "time": "all",
+            "floor": "high",
+            "blendMode": 1,
+            "lightHeight": 0.07,
+            "pivot": [0, 0],
+            "pulse": {
+                "duration": 1,
+                "reverse": false,
+                "value": false,
+                "time": 60,
+                "speed": 0.1,
+                "min": 0.35,
+                "max": 0.7
+            },
+            "oscilation": {
+                "duration": 1,
+                "time": 60,
+                "speed": 0.1,
+                "value": false,
+                "min": 0.35,
+                "max": 0.7
+            }
+        }
+    },
+    "collision": {
+        
+    },
+    "particle": {},
+    "sound": {
+    },
+    "weather": {},
+    "sprite": {},
+    "name": "toy",
+    "width": 1024,
+    "height": 1024
+}
