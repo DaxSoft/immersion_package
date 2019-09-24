@@ -1,0 +1,22 @@
+{
+    "collision": {
+
+        "body": {
+            "circle": { "param": [0, 0, 18], "pos": "center-bottom"},
+            "rect": {   "param": [18, 24],    "pos": "center-bottom" }
+        },
+
+        "base": {
+            "boucing": 0.075,
+            "space": 0.1,
+            "time": 3
+        }
+    },
+
+    "states": [
+        "walk",
+        "idle",
+        "dash",
+        "jump"
+    ]
+}

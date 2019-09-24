@@ -1,0 +1,28 @@
+{
+    "img": {
+        "background": "img/npc/background.png",
+        "map": "img/npc/map.button.png",
+        "npc": "img/npc/npc.button.png",
+        "update": "img/npc/update.button.png",
+        "add": "img/npc/add.button.png",
+        "remove": "img/npc/remove.button.png",
+        "return": "img/npc/return.button.png"
+    },
+
+    "home": {
+        "option": {
+            "return": {
+                "scene": "return",
+                "description": "Back to the game!"
+            }, 
+            "map": {
+                "scene": "map",
+                "description": "Here you gonna setup the network of maps. 'Cause, you don't wanna that the npcs with some type of magic, teleport to his destiny. You wanna that them find the path to location and go walking or running to there."
+            },
+            "npc": {
+                "scene": "npc",
+                "description": "Here you gonna setup our npcs. Load or create them. Set up the general setup and the behaviors components."
+            }
+        }
+    }
+}

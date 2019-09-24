@@ -1,0 +1,75 @@
+{
+    "general": {
+        "item": [],
+        "gold": 1,
+        "range": 5,
+        "home": 1,
+        "local": 1,
+        "nickname": "",
+        "work": "",
+        "age": { "current": 20, "max": 60, "die": true },
+        "felling": "admiration",
+        "import": "",
+        "dashing": 2,
+        "transfer": 1200
+    },
+
+    "img": {
+        "thought": "./img/system/NPCT.png"
+    },
+
+    "behavior": {
+        "thought": {
+            "invert": false,
+            "pos": [0, -10],
+            "animation": true,
+            "limit": 19,
+            "stop": 5,
+            "speed": 0.05,
+            "style": {
+                "fill": "#0f0f0f",
+                "fontSize": 14,
+                "cacheAsBitmap": true,
+                "fontFamily": "Times New Roman",
+                "align": "center",
+                "wordWrap": false
+            }
+        },
+        "message": [],
+        "cstart": [],
+        "ceval": [],
+        "cstop": [],
+        "eval": [],
+        "visible": true,
+        "active": false,
+        "time": 3,
+        "wait": 3,
+        "priority": 1
+    },
+
+    "time": {
+        "sec": 60,
+        "min": 60,
+        "hour": 24,
+        "day": 31,
+        "month": 12,
+        "dawn": [3, 7],
+        "morning":[7, 12],
+        "afternoon": [12, 18],
+        "evening": [18, 24],
+        "midnight": [0, 3],
+        "week": 7,
+        "speed": 1.0,
+        "start": { "sec": 0, "min": 1, "hour": 6, "day": 1, "week": 1, "month": 1, "year": 1 }
+    },
+
+    "friendship": {
+        "default": 0.5,
+        "worship": 1.0,
+        "great": 0.9,
+        "good": 0.75,
+        "common": 0.5,
+        "bad": 0.25,
+        "hatred": 0.1
+    }
+}

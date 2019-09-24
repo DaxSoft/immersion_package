@@ -1,0 +1,53 @@
+{
+	"alpha": {
+		"start": 0.06,
+		"end": 0.2
+	},
+	"scale": {
+		"start": 0.05,
+		"end": 0.01,
+		"minimumScaleMultiplier": 1
+	},
+	"color": {
+		"start": "#c2c2c2",
+		"end": "#fffed4"
+	},
+	"speed": {
+		"start": 200,
+		"end": 50,
+		"minimumSpeedMultiplier": 1
+	},
+	"acceleration": {
+		"x": 250,
+		"y": -100
+	},
+	"maxSpeed": 0,
+	"startRotation": {
+		"min": 255,
+		"max": 280
+	},
+	"noRotation": false,
+	"rotationSpeed": {
+		"min": 0,
+		"max": 0
+	},
+	"lifetime": {
+		"min": 0.2,
+		"max": 0.8
+	},
+	"blendMode": "add",
+	"frequency": 0.001,
+	"emitterLifetime": -1,
+	"maxParticles": 500,
+	"pos": {
+		"x": 0,
+		"y": 0
+	},
+	"addAtBack": true,
+	"spawnType": "circle",
+	"spawnCircle": {
+		"x": 0,
+		"y": 0,
+		"r": 15
+	}
+}

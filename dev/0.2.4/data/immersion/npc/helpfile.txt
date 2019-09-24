@@ -1,0 +1,81 @@
+[GENERAL]
+    [name] Setup the name of the NPC.
+    [nickname] setup the nickname of the npc. Default is nothing.
+    [id] id from event where is it  
+    [mapId] id from map where event is it 
+    [function] what the npc work at?
+    [age] {}
+        [current] the current age 
+        [max] the max age 
+        [die] can die? 
+    [gold] amount of the gold that the npc start
+    [item] [] the items that the npc have at start 
+    [range] distance at tile size of the vision range of npc 
+    [home] map id from home; place that the npc will sleep
+    [local] local where the 'home' is
+    [felling] the start mood of npc 
+    [import] the object form '~.behavior.json' setup;
+    [dashing] amount that will add to speed of npc when running
+
+[BEHAVIORS] Setup by local map ID
+    "MAPID": {} | "MAPID" has to be Number and the map has to exist
+    "home": will take the map id home from npc 'general setup'
+    "local": will take the local id from npc 'general setup'
+    INSIDE OF 'OBJECT {}' HAS TO BE IN "NUMBER": { SETUP } 
+        [priority] priority of ordem to execute behavior block 
+        [go] go to specific behavior block, avoid the ordem. In this case, refresh the ordem 
+    [thought] : setup of display's thought
+        [invert] : invert picture
+        [pos] additional position
+        [animation] will there animation?
+        [limit] limit of characters at display 
+        [stop] stop at the begin of phrase and at the end 
+        [speed] speed that will slice the characters 
+        [style] style in css style of text 
+    [eval] 
+    [cstart] : condition to start the behavior 
+    [ceval] : condition to execute the command 
+    [visible] : the thought will be visible?
+    [active] : this behavior is active?
+    [time] : time that shall be wait to execute the command 
+    [wait] : wait until execute the next behavior 
+    [priority] : priority of this behavior, shall affect the ordem of behaviors at end.
+
+
+[TIME]
+    [sec] limit of a sec 
+    [min] limit of a min 
+    [hour] limit of a hour 
+    [day] limit of a day 
+    [week] limit of a week 
+    [month] limit of a month 
+    [dawn] [morning] [afternoon] [evening] [midnight]
+        [begin at, end at]
+    [start] start of current time at
+        [sec] [min] [hour] [day] [week] [month] [year]
+    [speed] speed that will increase the sec 
+
+[FRIENDSHIP]
+    [default] default for each other friend; value 
+    [worship] states to have worship relation
+    [great] states to have great relation
+    [good] states to have good relation
+    [common] states to have a common relation
+    [bad] states to have a bad relation
+    [hatred] states to have a hatred relation
+
+[MAP]
+    Here you gonna setup where this map can be accessed... mostly for npcs 
+    "mapid": MAP WHERE THE NPC IS
+    "l": MAP WHERE THE NPC WANNA GO
+    [[x,y]]: POSITION WHERE THE NPC WILL GO TO TRANSFER TO 'l' based on 'mapid'
+    "mapid": {
+        "x": [[9,12],[9,13],[9,14]]
+    },
+
+[ROUTE]:
+    If is going to map 'X', check up if is on 'Y', then set to what map need to go 'Z'
+    In which can be set uo on '[MAP]'.
+    "X": {
+        "Y": ["Z"]
+    }

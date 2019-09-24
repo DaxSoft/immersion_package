@@ -1,0 +1,20 @@
+{
+    "guard": {
+        "author": "default",
+        "description": "Example of point guard behavior.",
+        "behavior": {
+            "local": {
+                "guard to home": {
+                    "0": {
+                        "eval": ["@:transfer 2 1"]
+                    }
+                }
+            },
+
+            "home": {
+                
+            }
+        }
+
+    }
+}

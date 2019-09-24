@@ -1,0 +1,14 @@
+{
+    "general": {
+        "name": "Peter",
+        "nickname": "Tomato",
+        "work": "Guard",
+        "id": "9",
+        "mapId": "1",
+        "age": { "current": 22, "max": 60, "die": true },
+        "home": 2,
+        "local": 1,
+        "felling": "grief",
+        "import": "guard"
+    }
+}

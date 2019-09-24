@@ -1,0 +1,109 @@
+{
+    "states": [{
+            "id": "idle",
+            "name": "Idle",
+            "properties": [
+                "rate",
+                "size"
+            ],
+            "frames": "idle",
+            "icon": "box.png"
+        },
+        {
+            "id": "moving",
+            "name": "Walking",
+            "properties": [
+                "rate",
+                "size"
+            ],
+            "frames": "",
+            "icon": "box.png"
+        },
+        {
+            "id": "add",
+            "name": "Create",
+            "command": "this.add_states()",
+            "icon": "add.png"
+        },
+        {
+            "id": "back",
+            "name": "Return",
+            "command": "this.return_from_states()",
+            "icon": "success.png"
+        }
+    ],
+
+
+    "collision": {
+        "general": {
+            "type": "circle",
+            "pos": 0,
+            "radius": 12
+        }
+    },
+
+    "direction": [
+        {
+            "label": "Idle",
+            "value": 0,
+            "dir": 0
+        },
+        {
+            "label": "Down",
+            "value": 1,
+            "dir": 2
+        },
+        {
+            "label": "Up",
+            "value": 2,
+            "dir": 8
+        },
+        {
+            "label": "Left",
+            "value": 3,
+            "dir": 4
+        },
+        {
+            "label": "Right",
+            "value": 4,
+            "dir": 6
+        }
+    ],
+
+    "mainopt": [{
+            "icon": "add.png",
+            "label": "Open",
+            "id": "open"
+        },
+        {
+            "icon": "system.png",
+            "label": "States",
+            "id": "states"
+        },
+        {
+            "icon": "collision.png",
+            "label": "Collision",
+            "id": "collision"
+        },
+        {
+            "icon": "light-ambient.png",
+            "label": "Ambient",
+            "id": "alight"
+        },
+        {
+            "icon": "light-bulb.png",
+            "label": "Point",
+            "id": "plight"
+        },
+        {
+            "icon": "light-directional.png",
+            "label": "Directional",
+            "id": "dlight"
+        },
+        {
+            "icon": "save.png",
+            "label": "Save",
+            "id": "save"
+        }
+    ]
+}

@@ -1,0 +1,2027 @@
+/**
+ * @file [haya_map_editor.js -> Haya - Map Editor]
+ * @description This is a editor in-game for the maps using
+ * Haya elements.
+ * =====================================================================
+ * @author Dax Soft | Kvothe <www.dax-soft.weebly.com> / <dax-soft@live.com>
+ * @thanks to Jonforum!
+ * @version 0.2.2
+ * @license HAYA <https://dax-soft.weebly.com/legal.html>
+ * @requires 1.6.+ <<RPG Maker MV Version>>
+ * @todo 
+ *  [x] Light Editor
+ *      [x] : Editor itself
+ *          [x] : position
+ *              [x] : Long pressing mouse to change
+ *          [x] : light height
+ *          [x] : brightness
+ *          [x] : radius
+ *          [x] : color
+ *              [x] : Pallete
+ *              [x] : Change value itself
+ *          [x] : falloff
+ *          [x] : Pulse (Effect)
+ *          [x] : Switch to On/Off
+ *          [x] : Time cycle
+ *              [x] : Day, Afternoon, Night
+ *          [x] : Blend 
+ *      [x] : +Point
+ *      [x] : +Directional
+ *      [x] : +Picture
+ *  [x] Particle Editor
+ *      [x] Editor itself
+ *          [x] : Position
+ *          [] : Accelaration
+ *          [] : Change texture
+ *          [] : Z Index
+ *          [] : Switch to on/off
+ *      [x] +Particle
+ *  [x] Collision Editor
+ *      [x] : Editor itself
+ *          [x] : Position
+ *          [x] : Radius
+ *          [x] : Scale
+ *          [x] : Angle
+ *          [x] : Point
+ *          [x] : Label name
+ *          [] : Switch to on/off
+ *          []
+ *      [x] : +Rectangle
+ *      [x] : +Polygon
+ *      [x] : +Circle
+ *  [] Sound Editor
+ * =====================================================================
+ */
+var Imported = Imported || {};
+var Haya = Haya || {};
+Haya.Map_Editor = Haya.Map_Editor || {};
+/*:
+ * @author Dax Soft | Kvothe
+ * 
+ * @plugindesc [0.2.1] Haya Map Editor
+ * 
+ * @help Scene Editor for the Haya Map. To create/edit all stuff from 
+ * map
+ * 
+ */
+
+Input.keyMapper = {
+    9: 'tab',       // tab
+    13: 'ok',       // enter
+    16: 'shift',    // shift
+    17: 'control',  // control
+    18: 'control',  // alt
+    27: 'escape',   // escape
+    32: 'ok',       // space
+    33: 'pageup',   // pageup
+    34: 'pagedown', // pagedown
+    37: 'left',     // left arrow
+    38: 'up',       // up arrow
+    39: 'right',    // right arrow
+    40: 'down',     // down arrow
+    45: 'escape',   // insert
+    81: 'pageup',   // Q
+    87: 'pagedown', // W
+    88: 'escape',   // X
+    90: 'ok',       // Z
+    96: 'escape',   // numpad 0
+    98: 'down',     // numpad 2
+    100: 'left',    // numpad 4
+    102: 'right',   // numpad 6
+    104: 'up',      // numpad 8
+    120: 'debug',    // F9,
+    65: 'a',
+    66: 'b',
+    67: 'c',
+    68: 'd',
+    69: 'e',
+    90: 'z',
+    89: 'x',
+    89: 'y',
+    82: 'r',
+    83: 's',
+
+};
+
+(function ($) {
+    'use strict';
+    // ========================================================================
+    //
+    /**
+     * @var data 
+     * @description handle with general information about all maps
+     */
+    $.data = {
+        // handle with all map
+        library: { directory: {}, map: {} },
+    }
+    /**k
+     * @description editor variable control
+     */
+    $.editor = {
+        //
+        _visible: false,
+        // control
+        control: null,
+        // target
+        target: null,
+        // control to edit
+        wedit: null,
+        // buffer
+        weditChange: false,
+        //
+        weditCallback: null,
+        //
+        textInput: false,
+        // timeBuffer
+        timeBuffer: 1,
+        timeBufferMax: 60,
+        // color control
+        pallete: {
+            // colors
+            red: 16, green: 16, blue: 16,
+            r: 16, g: 16, b: 16,
+            // pallete
+            color: Haya.File.json(Haya.File.local("img/maps/editor/color.json"))
+        },
+        // blend mode
+        blend: {
+            // kind of
+            kind: 0,
+            // list of
+            list: [
+                [PIXI.BLEND_MODES.ADD, "ADD"], // 0
+                [PIXI.BLEND_MODES.MULTIPLY, "MULTIPLY"],
+                [PIXI.BLEND_MODES.SCREEN, "SCREEN"],
+                [PIXI.BLEND_MODES.OVERLAY, "OVERLAY"],
+                [PIXI.BLEND_MODES.DARKEN, "DARKEN"],
+                [PIXI.BLEND_MODES.LIGHTEN, "LIGHTEN"],
+                [PIXI.BLEND_MODES.COLOR_DODGE, "COLOR DODGE"],
+                [PIXI.BLEND_MODES.COLOR_BURN, "COLOR BURN"],
+                [PIXI.BLEND_MODES.HARD_LIGHT, "HARD LIGHT"],
+                [PIXI.BLEND_MODES.SOFT_LIGHT, "SOFT LIGHT"],
+                [PIXI.BLEND_MODES.DIFFERENCE, "DIFFERENCE"],
+                [PIXI.BLEND_MODES.EXCLUSION, "EXCLUSION"],
+                [PIXI.BLEND_MODES.HUE, "HUE"],
+                [PIXI.BLEND_MODES.SATURATION, "SATURATION"],
+                [PIXI.BLEND_MODES.COLOR, "COLOR"],
+                [PIXI.BLEND_MODES.LUMINOSITY, "LUMINOSITY"],
+                [PIXI.BLEND_MODES.NORMAL, "NORMAL"]
+            ]
+        },
+        // reset all variables
+        _reset: () => {
+            $.editor.control = null;
+            $.editor.target = null;
+            $.editor.wedit = null;
+            $.editor.blend.kind = 0;
+        },
+    }
+    //
+    $.value = {
+        micro: 0.1,
+        normal: 1,
+        macro: 10
+    }
+    /**
+     * @description save variable control
+     */
+    $.save = {
+        // save lights
+        light: {},
+        //
+        collision: {},
+        //
+        particle: {},
+        // 
+        sound: {}
+    }
+    //
+    $.particle = { source: {}, textures: {} };
+    $.light = { textures: {} }
+    $.sound = { bgm: {}, bgs: {}, me: {}, se: {} }
+    //
+    $.time = 0;
+    // =================================================================================
+    Haya.File.list("data/particles", function (filename) {
+        // replace filename
+        let _filename = filename.replace(/^.*[\\\/]/, '');
+        // load just '.json' file
+        if (_filename.match(/\.json$/gi)) {
+            // load data 'npc' setup
+            let _json = Haya.File.json(filename);
+            let name = _filename.replace(/\.json/gi, "")
+            //
+            $.particle.source[name] = [_filename, _json, filename];
+        }
+    }) // end object
+
+    Haya.File.list("img/particles", function (filename) {
+        // replace filename
+        let _filename = filename.replace(/^.*[\\\/]/, '');
+        // load just '.json' file
+        if (_filename.match(/\.png$/gi)) {
+            // load data 'npc' setup
+            let name = _filename.replace(/\.png/gi, "")
+            //
+            $.particle.textures[name] = [_filename, filename];
+        }
+    }) // end object
+
+    Haya.File.list("img/maps/lights", function (filename) {
+        // replace filename
+        let _filename = filename.replace(/^.*[\\\/]/, '');
+        // load just '.json' file
+        if (_filename.match(/\.png$/gi)) {
+            // load data 'npc' setup
+            let name = _filename.replace(/\.png/gi, "")
+            //
+            $.light.textures[name] = [_filename, filename];
+        }
+    }) // end object
+
+    Haya.File.list("audio/bgm", function (filename) {
+        // replace filename
+        let _filename = filename.replace(/^.*[\\\/]/, '');
+        // load just '.json' file
+        if (_filename.match(/\.ogg$/gi)) {
+            // load data 'npc' setup
+            let name = _filename.replace(/\.ogg/gi, "")
+            //
+            $.sound.bgm[name] = [_filename, filename];
+        }
+    }) // end object
+
+    Haya.File.list("audio/bgs", function (filename) {
+        // replace filename
+        let _filename = filename.replace(/^.*[\\\/]/, '');
+        // load just '.json' file
+        if (_filename.match(/\.ogg$/gi)) {
+            // load data 'npc' setup
+            let name = _filename.replace(/\.ogg/gi, "")
+            //
+            $.sound.bgs[name] = [_filename, filename];
+        }
+    }) // end object
+
+    Haya.File.list("audio/me", function (filename) {
+        // replace filename
+        let _filename = filename.replace(/^.*[\\\/]/, '');
+        // load just '.json' file
+        if (_filename.match(/\.ogg$/gi)) {
+            // load data 'npc' setup
+            let name = _filename.replace(/\.ogg/gi, "")
+            //
+            $.sound.me[name] = [_filename, filename];
+        }
+    }) // end object
+
+    Haya.File.list("audio/se", function (filename) {
+        // replace filename
+        let _filename = filename.replace(/^.*[\\\/]/, '');
+        // load just '.json' file
+        if (_filename.match(/\.ogg$/gi)) {
+            // load data 'npc' setup
+            let name = _filename.replace(/\.ogg/gi, "")
+            //
+            $.sound.se[name] = [_filename, filename];
+        }
+    }) // end object
+    //
+    // load
+    Haya.Pixi.Manager.load({
+        toolbar_light: Haya.File.local("img/maps/editor/toolbar_light.png"),
+        toolbar_collision: Haya.File.local("img/maps/editor/toolbar_light.png"),
+        toolbar_particle: Haya.File.local("img/maps/editor/toolbar_light.png"),
+        toolbar_sound: Haya.File.local("img/maps/editor/toolbar_light.png"),
+        toolbar_setup: Haya.File.local("img/maps/editor/toolbar_light.png"),
+        toolbar_filter: Haya.File.local("img/maps/editor/toolbar_light.png"),
+        toolbar_event: Haya.File.local("img/maps/editor/toolbar_light.png"),
+        save: Haya.File.local("img/maps/editor/save.png")
+    })
+    //
+    //$gameSystem = new Game_System();
+    /**
+     * @description load all maps information
+     */
+    function loadLibrary() {
+        let directory = Haya.File.dirList(Haya.File.local("img/maps"));
+        directory.forEach((dir) => {
+            // record all except by editor stuffs
+            if (!(dir.match(/(editor|Maps)$/gi))) {
+                // get the map name
+                let mapName = dir.split(/\\|\//gi); mapName = mapName[mapName.length - 1];
+                $.data.library.directory[mapName] = Haya.File.clean(dir);
+            }
+        })
+        // setu´4
+        //$.data.library.map = Haya.File.json(Haya.File.local("img/maps/map.json"));
+    }; loadLibrary();
+    // ========================================================================
+    function List() { this.initialize.apply(this, arguments); }
+    List.prototype = Object.create(Window_Selectable.prototype);
+    List.prototype.constructor = List;
+
+    List.prototype.initialize = function (x, y) {
+        Window_Selectable.prototype.initialize.call(this, x, y, 256, Graphics.height - 128)
+        this._oldPoint = new Point(x, y);
+        this._data = [];
+        this.hide();
+        this.deactivate();
+        this.close();
+    }
+
+    List.prototype.maxCols = function () {
+        return 1;
+    };
+
+    List.prototype.spacing = function () {
+        return 32;
+    };
+
+    List.prototype.update = function () {
+        Window_Selectable.prototype.update.call(this);
+    };
+
+    List.prototype.maxItems = function () {
+        return this._data ? this._data.length : 1;
+    };
+
+    List.prototype.drawItem = function (index) {
+        var item = this._data[index];
+        if (item === undefined) return;
+        var rect = this.itemRect(index);
+        this.contents.fontSize = 14;
+        if (typeof item === 'string') {
+            this.drawText(item, rect.x, rect.y, rect.width, rect.height)
+        } else {
+            if ($.editor.control === "light") {
+                this.drawText(`[${item.sprite.time}] ${item.kind}_${item._name}`, rect.x, rect.y, rect.width, rect.height)
+            } else if ($.editor.control === "particle") {
+                this.drawText(`${item.name}`, rect.x, rect.y, rect.width, rect.height)
+            } else if ($.editor.control === "collision") {
+                this.drawText(item._name, rect.x, rect.y, rect.width, rect.height)
+            } else if ($.editor.control === "setup") {
+                this.drawText((item[0] + "\t\t\t" + item[1]), rect.x, rect.y, rect.width, rect.height)
+            }
+
+        }
+
+    };
+
+    List.prototype.refresh = function () {
+        this.createContents();
+        this.drawAllItems();
+    };
+    // ========================================================================
+    function Pallete_Color() { this.initialize.apply(this, arguments); }
+    Pallete_Color.prototype = Object.create(Window_Selectable.prototype);
+    Pallete_Color.prototype.constructor = Pallete_Color;
+
+    Pallete_Color.prototype.initialize = function (x, y) {
+        Window_Selectable.prototype.initialize.call(this, x, y, 232, Graphics.height - 128)
+        this._oldPoint = new Point(x, y);
+        this._data = [];
+        this.hide();
+        this.deactivate();
+        this.close();
+    }
+
+    Pallete_Color.prototype.maxCols = function () {
+        return 3;
+    };
+
+    Pallete_Color.prototype.maxItems = function () {
+        return this._data ? this._data.length : 1;
+    };
+
+    Pallete_Color.prototype.spacing = function () {
+        return 32;
+    };
+
+    Pallete_Color.prototype.update = function () {
+        Window_Selectable.prototype.update.call(this);
+    };
+
+    Pallete_Color.prototype.drawItem = function (index) {
+        var item = this._data[index];
+        if (item === undefined) return;
+        var rect = this.itemRect(index);
+        this.contents.fontSize = 72;
+        this.contents.textColor = item.replace("0x", "#");
+        this.drawText("•", rect.x, rect.y, rect.width, rect.height, 'left')
+    };
+
+    Pallete_Color.prototype.refresh = function () {
+        this.createContents();
+        this.drawAllItems();
+    };
+    // ========================================================================
+
+    // ========================================================================
+
+    Sprite_Map.prototype.createCharacter = function () {
+
+
+        this._characters = [];
+        // create player
+        // new Sprite_Character($gamePlayer)
+        var player = new Haya.Map.Hayaset_Character($gamePlayer);
+        this._characters.push(player);
+
+        // name & zIndex
+        this._characters.forEach((value, index) => {
+            value.name = `character_${index}`
+            value.children.forEach((ch) => {
+                ch.z = 3;
+                ch.zIndex = Haya.Map.group.layer["object"];
+                ch.parentGroup.zIndex = ch.zIndex;
+            })
+            this.sprite.addChild(value)
+            print(value.children[0], 'character')
+        })
+        // add
+        //(...this._characters);
+    }
+
+    Game_Map.prototype.setupEvents = function () {
+        this._events = [];
+
+    };
+    // ========================================================================
+    // ========================================================================
+    class Scene_Editor extends Scene_Base {
+        // ===========================================================
+        constructor() {
+            super();
+            this.toolbar = true;
+            this.button = {};
+            this.gui = new PIXI.Container();
+            this.gui.toolbar = new PIXI.Container();
+            this.graphicCollision = new PIXI.Container();
+            this.gui.addChild(this.graphicCollision);
+            this.gui.editor = new PIXI.Container();
+            this.gui.addChild(this.gui.toolbar, this.gui.editor)
+
+            this.particle = { element: [], source: {} }
+            this.light = { element: [], source: {} }
+            this.filter = { element: [], source: {} }
+            this.collision = { element: [], source: {}, graphic: [] }
+            this.sound = { element: [], source: {}, graphic: [] }
+
+            this.display = new Point(0, 0);
+        }
+
+        start() {
+            super.start.call(this)
+            SceneManager.clearStack();
+        }
+
+        update() {
+            this.updateMain();
+            super.update.call(this);
+            this.updateUI();
+            this.updatePivot();
+        }
+
+        create() {
+            super.create.call(this);
+
+        }
+        // ===========================================================
+        isReady() {
+            if (!this._mapLoaded) {
+                this.onMapLoaded();
+                this._mapLoaded = true;
+            }
+            return this._mapLoaded && super.isReady.call(this);
+        }
+
+        onMapLoaded() {
+            this.createDisplayObjects();
+        }
+
+        updateMain() {
+            var active = this.isActive();
+            $gameMap.update(active);
+            $gamePlayer.update(active);
+            $gameTimer.update(active);
+            //$gameScreen.update();
+            this._spriteset.update();
+        }
+
+        isBusy() {
+            return super.isBusy.call(this);
+        }
+        // ===========================================================
+        createDisplayObjects() {
+            // create
+            this.createSpriteset();
+            this.createWindowLayer();
+
+            this.createCollision();
+            this.gui.list = new List(64, 64);
+            this.gui.list.setHandler('ok', this.onEditList.bind(this))
+            this.gui.addChild(this.gui.list)
+
+            this.gui.pallete = new Pallete_Color(Graphics.width - 256, 64);
+            this.gui.addChild(this.gui.pallete)
+            this.gui.pallete._data = [];
+            Object.keys($.editor.pallete.color).map((key) => {
+                let element = $.editor.pallete.color[key]
+                this.gui.pallete._data.push(element)
+            })
+            this.gui.pallete.setHandler('ok', this.onColorPick.bind(this))
+            this.gui.pallete.refresh();
+            // createUI
+            this.createUI();
+            //
+            this.light.source = this._spriteset.light.source;
+            this.light.element = this._spriteset.light.element;
+
+            this.gui.folderLight = new Haya.GUI.FolderManager({
+                folder: "img/maps/lights",
+                filetype: /\.png$/gi,
+                action: function (texture) {
+                    SceneManager._scene._spriteset.addLight(
+                        "sprite " + String(SceneManager._scene.light.element.length + 1),
+                        "sprite",
+                        {
+                            texture: texture.url,
+                            kind: "sprite"
+                        },
+                        SceneManager._scene._spriteset.sprite
+                    )
+                }
+            })
+            this.gui.addChild(this.gui.folderLight)
+            this.addChild(this.gui)
+        }
+
+        createSpriteset() {
+            this._spriteset = new Sprite_Map();
+            this.addChild(this._spriteset.sprite);
+        }
+
+        createUI() {
+            this.button.light = new Haya.GUI.Button({
+                text: "LIGHT",
+                action: () => {
+                    this.refresh();
+                    if (typeof $.editor.control === 'string') {
+                        if (!($.editor.control.includes("light"))) {
+                            $.editor.control = null;
+                        }
+                    }
+                    if ($.editor.control === "light-edit") {
+
+                        $.editor.control = "light";
+
+                        // deactive edit gui
+                        this.refreshEditor();
+
+                        SceneManager._scene.gui.list.activate();
+                        SceneManager._scene.gui.list.open();
+                        SceneManager._scene.gui.list.show();
+                        SceneManager._scene.refreshLightList();
+
+
+                    } else {
+                        // update
+                        $.editor.control = $.editor.control === null ? "light" : null;
+
+                        if ($.editor.control === "light") {
+                            SceneManager._scene.refreshLightList();
+
+                        } else {
+                            SceneManager._scene.gui.list.deactivate();
+                            SceneManager._scene.gui.list.close();
+                            SceneManager._scene.gui.list.hide();
+                        }
+                    }
+                }
+            })
+            this.gui.toolbar.addChild(this.button.light)
+
+            this.button.collision = new Haya.GUI.Button({
+                text: "COLLISION",
+                position: [100, 0],
+                action: () => {
+                    this.refresh();
+                    if (typeof $.editor.control === 'string') {
+                        if (!($.editor.control.includes("collision"))) {
+                            $.editor.control = null;
+                        }
+                    }
+
+                    if ($.editor.control === "collision-edit") {
+
+                        $.editor.control = "collision";
+
+                        SceneManager._scene.refreshEditor();
+
+                        SceneManager._scene.gui.list.activate();
+                        SceneManager._scene.gui.list.open();
+                        SceneManager._scene.gui.list.show();
+                        SceneManager._scene.refreshCollisionList();
+
+                    } else {
+                        // update
+                        $.editor.control = $.editor.control === null ? "collision" : null;
+
+                        if ($.editor.control === "collision") {
+                            SceneManager._scene.refreshCollisionList();
+
+                        } else {
+                            SceneManager._scene.gui.list.deactivate();
+                            SceneManager._scene.gui.list.close();
+                            SceneManager._scene.gui.list.hide();
+                        }
+                    }
+                }
+            })
+            this.gui.toolbar.addChild(this.button.collision)
+
+            this.button.particle = new Haya.GUI.Button({
+                text: "PARTICLE",
+                position: [200, 0],
+                action: () => {
+                    this.refresh();
+                }
+            })
+            this.gui.toolbar.addChild(this.button.particle)
+
+            this.button.sound = new Haya.GUI.Button({
+                text: "SOUND",
+                position: [300, 0],
+                action: () => {
+                    this.refresh();
+                }
+            })
+            this.gui.toolbar.addChild(this.button.sound)
+
+            this.button.weather = new Haya.GUI.Button({
+                text: "WEATHER",
+                position: [400, 0],
+                action: () => {
+                    this.refresh();
+                }
+            })
+            this.gui.toolbar.addChild(this.button.weather)
+
+            this.button.save = new Haya.GUI.Button({
+                text: "SAVE",
+                position: [500, 0],
+                action: () => {
+                    this.refresh();
+                    // header
+                    $.save.name = Haya.Map.current.name;
+                    $.save.id = Haya.Map.id;
+                    $.save.width = Haya.Map.current.width;
+                    $.save.height = Haya.Map.current.height;
+                    // save light components
+                    Object.keys(this._spriteset.light.source).map((value, index) => {
+                        // is sprite
+                        if (item.kind === "sprite") {
+                            $.save.light[value] = {
+                                position: [item.sprite.x, item.sprite.y],
+                                url: item.sprite.texture.baseTexture.imageUrl || null,
+                                alpha: item.sprite.alpha || 1.0,
+                                switch: item.switch,
+                                nature: item.nature,
+                                name: item.name,
+                                kind: item.kind,
+                                time: item.time,
+                                blendMode: item.sprite.blendMode,
+                                pivot: [item.sprite.pivot.x, item.sprite.pivot.y],
+                                scale_x: item.sprite.scale.x,
+                                scale_y: item.sprite.scale.y,
+                                rotation: item.sprite.rotation,
+                                tint: item.sprite.tint,
+                                anchor_x: item.sprite.anchor.x,
+                                anchor_y: item.sprite.anchor.y,
+                                pulse: item.pulse
+                            };
+                        } else {
+                            $.save.light[value] = {
+                                position: [item.sprite.x, item.sprite.y],
+                                range: item.sprite.range,
+                                switch: item.switch,
+                                color: item.sprite._color,
+                                nature: item.nature,
+                                dirty: item.sprite.dirty,
+                                brightness: Haya.DMath.float(item.sprite.brightness),
+                                falloff: [Haya.DMath.float(item.sprite.falloff[0]), Haya.DMath.float(item.sprite.falloff[1]), Haya.DMath.float(item.sprite.falloff[2])],
+                                name: item.name,
+                                kind: item.kind,
+                                time: item.time,
+                                blendMode: item.sprite.blendMode,
+                                lightHeight: Haya.DMath.float(item.sprite.lightHeight),
+                                pivot: [item.sprite.pivot.x, item.sprite.pivot.y],
+                                pulse: item.pulse
+                            };
+                        }
+                    })
+                    // save collision components
+                    Object.keys(this.collision.source).map((value, index) => {
+                        // item
+                        let item = this.collision.source[value];
+                        //
+                        $.save.collision[value] = {
+                            x: item.x,
+                            y: item.y,
+                            kind: item._kind,
+                            name: item._name,
+                            padding: item.padding,
+                        };
+
+                        // if is circle
+                        if (item._kind === "circle") {
+                            $.save.collision[value]["radius"] = item.radius
+                            $.save.collision[value]["scale"] = item.scale;
+                        } else if (item._kind === "polygon" || item._kind === "rect") {
+                            $.save.collision[value]["scale_x"] = Haya.DMath.float(item.scale_x);
+                            $.save.collision[value]["scale_y"] = Haya.DMath.float(item.scale_y);
+                            $.save.collision[value]["angle"] = item.angle;
+                            $.save.collision[value]["points"] = item.cachePoints;
+                        }
+
+                        $.save.collision[value]["floor"] = item.floor;
+                        print( $.save.collision[value]["floor"])
+
+                    })
+                    // save
+                    Haya.File.wjson($.save, "img/maps/" + Haya.Map.current.name + "/data")
+                    // alert it
+                    alert("Saved!");
+                    return;
+                }
+            })
+            this.gui.toolbar.addChild(this.button.save)
+        }
+
+        createCollision() {
+            $.collision = new Haya.Collision.Collision();
+            $.result = Haya.Collision.System.createResult();
+            if (Object.keys(Haya.Map.current.collisionData).length > 0) {
+                Object.keys(Haya.Map.current.collisionData).map((collisionName) => {
+                    //
+                    let element = Haya.Map.current.collisionData[collisionName];
+                    this.collision.source[collisionName] = Haya.Collision.createCollision(
+                        $.collision, element.kind, element
+                    )
+                    this.collision.source[collisionName]._name = collisionName;
+                    this.collision.source[collisionName]._kind = element.kind
+                    // 
+                    this.collision.element.push(this.collision.source[collisionName])
+                })
+            }
+
+            this.collisionDraw();
+        }
+
+        collisionDraw() {
+            this.collision.element.forEach((element) => {
+
+                if (Haya.Utils.invalid(element._graphic)) {
+                    element._graphic = new PIXI.Graphics();
+                    this.graphicCollision.addChild(element._graphic);
+                }
+
+                this.collisionGraphic(element);
+
+                if (element._graphic.stage === undefined || element._graphic.stage === null) {
+                    this.graphicCollision.addChild(element._graphic);
+                }
+            })
+        }
+
+        collisionGraphic(element, selected) {
+            if (Haya.Utils.invalid(element)) return;
+            if (Haya.Utils.invalid(element._graphic)) return;
+            element._graphic.clear();
+            if (selected === true) {
+                element._graphic.lineStyle(1, '0x3498db', 1, 2);
+            } else {
+                element._graphic.lineStyle(1, '0xe74c3c', 1, 0.5);
+            }
+            element._graphic.beginFill('0xffffff', 0.1);
+            element.draw(element._graphic)
+            element._graphic.endFill();
+        }
+        // ===========================================================
+        updateUI() {
+            // to show, to hide
+            if (TouchInput.isCancelled()) this.toolbar = !this.toolbar;
+            this.gui.visible = this.toolbar;
+            Object.keys(this.button).map((bkey) => {
+                if (this.button[bkey]) {
+                    if (this.gui.visible === true) this.button[bkey].update()
+                }
+            })
+            // update GUI.List
+            if (typeof $.editor.control === 'string') {
+                if (!($.editor.control.includes("-edit"))) {
+                    this.gui.list.update();
+                    this.gui.list.visible = this.toolbar;
+                    this.gui.list.x = this.gui.list.visible ? this.gui.list._oldPoint.x : -Graphics.width;
+
+                    this.gui.pallete.hide();
+                    this.gui.pallete.deactivate();
+                    this.gui.pallete.close();
+                    //this.window.edit.visible = false;
+
+
+                    // if ($.editor.control === "collision") {
+                    //     if (this.oldIndex !== this.gui.list._index) {
+                    //         this.oldIndex = this.gui.list._index
+                    //         this.refreshDraw();
+                    //         this.refreshGraphic(this.window.list.current(), true);
+                    //     }
+                    // }
+                } else if (($.editor.control.includes("-edit"))) {
+                    // reset
+                    this.gui.list.close();
+                    this.gui.list.deactivate();
+                    this.gui.list.hide();
+                    // 
+                    Object.keys(this.gui.editor.button).map((bkey) => {
+                        if (this.gui.editor.button[bkey]) {
+                            if (this.gui.visible === true) this.gui.editor.button[bkey].update()
+                        }
+                    })
+                    // wedit
+                    if ($.editor.wedit !== null) this.wedit();
+                }
+            }
+            this.graphicCollision.visible = ($.editor.control === "collision" || $.editor.control === "collision-edit");
+            this.gui.folderLight.update();
+        }
+
+        updatePivot() {
+            //
+            if (Haya.Mouse.x.isBetween(0, Graphics.width) && (Haya.Mouse.y.isBetween(0, 16))) {
+                this.display.y -= 8;
+                if (this.display.y <= 8) {
+                    this.display.y = 0;
+                }
+            } else if (Haya.Mouse.x.isBetween(0, Graphics.width) && (Haya.Mouse.y.isBetween(Graphics.height - 16, Graphics.height))) {
+                this.display.y += 8;
+                if (this.display.y >= ((Haya.Map.current.height || Graphics.height) - Graphics.height)) {
+                    this.display.y = ((Haya.Map.current.height || Graphics.height) - Graphics.height);
+                }
+            } else if (Haya.Mouse.x.isBetween(0, 16) && (Haya.Mouse.y.isBetween(0, Graphics.height))) {
+                this.display.x -= 8;
+                if (this.display.x <= 8) {
+                    this.display.x = 0;
+                }
+            } else if (Haya.Mouse.x.isBetween(Graphics.width - 16, Graphics.width) && (Haya.Mouse.y.isBetween(0, Graphics.height))) {
+                this.display.x += 8;
+                if (this.display.x >= ((Haya.Map.current.width || Graphics.width) - Graphics.width)) {
+                    this.display.x = ((Haya.Map.current.width || Graphics.width) - Graphics.width);
+                }
+            }
+            //
+        }
+
+        // ===========================================================
+        refreshLightList() {
+            this.light.source = this._spriteset.light.source;
+            this.light.element = this._spriteset.light.element;
+            //
+            $.editor.wedit = null;
+            this.gui.list._data = [];
+            this.gui.list._data.push("New Point")
+            this.gui.list._data.push("New Directional")
+            this.gui.list._data.push("New Ambient")
+            this.gui.list._data.push("New Sprite")
+            Object.keys(this.light.source).map((lights, index) => {
+                // element
+                let element = this.light.source[lights];
+                // push
+                this.gui.list._data.push(element)
+            })
+            this.gui.list.activate()
+            this.gui.list.open();
+            this.gui.list.show();
+            this.gui.list.refresh();
+
+        }
+
+        refreshCollisionList() {
+            $.editor.wedit = null;
+            this.gui.list._data = [];
+            this.gui.list._data.push("New Polygon")
+            this.gui.list._data.push("New Circle")
+            this.gui.list._data.push("New Rect")
+
+            if (this.collision.element.length > 0) {
+                this.collision.element.forEach((element) => {
+                    this.gui.list._data.push(element);
+                })
+            }
+
+            this.gui.list.activate()
+            this.gui.list.open();
+            this.gui.list.show();
+            this.gui.list.refresh();
+
+
+            print($.collision);
+            this.collisionDraw();
+        }
+
+        refreshEditor() {
+            if (this.gui.editor.children.length > 0) {
+                let ixd = this.gui.editor.children.length;
+                while (ixd--) {
+                    this.gui.editor.removeChild(this.gui.editor.children[ixd])
+                }
+                this.gui.editor.children.length = 0;
+            }
+            $.editor.blend.kind = 0;
+            this.gui.editor.button = {};
+        }
+
+        refresh() {
+            this.refreshEditor();
+            this.gui.folderLight.close();
+        }
+        // ===========================================================
+        onEditList() {
+            if ($.editor.control === "light") {
+                let element = this.gui.list.current();
+                if (typeof element === 'string') {
+                    if (element.toLocaleLowerCase() === "new point") {
+                        this._spriteset.addLight(
+                            "point " + String(this.light.element.length + 1),
+                            "pixi",
+                            {
+                                radius: 300,
+                                kind: "point"
+                            },
+                            this._spriteset.sprite
+                        )
+                        this.gui.list.activate()
+                        this.refreshLightList();
+                    } else if (element.toLocaleLowerCase() === "new directional") {
+                        this._spriteset.addLight(
+                            "directional " + String(this.light.element.length + 1),
+                            "pixi",
+                            {
+                                radius: 300,
+                                kind: "directional",
+                                target: new Point(0, 0)
+                            },
+                            this._spriteset.sprite
+                        )
+                        this.gui.list.activate()
+                        this.refreshLightList();
+                    } else if (element.toLocaleLowerCase().includes("ambient")) {
+                        this._spriteset.addLight(
+                            "ambient " + String(this.light.element.length + 1),
+                            "pixi",
+                            {
+                                kind: "ambient"
+                            },
+
+                            this._spriteset.sprite
+                        )
+                        this.gui.list.activate()
+                        this.refreshLightList();
+                    } else if (element.toLocaleLowerCase() === "new sprite") {
+                        this.gui.list.close();
+                        this.gui.list.deactivate();
+                        this.gui.list.hide()
+                        this.gui.folderLight.open();
+                    }
+                    return;
+                }
+
+                $.editor.control = "light-edit";
+                $.editor.wedit = null;
+                this.gui.list.close();
+                this.gui.list.deactivate();
+                this.gui.list.hide()
+                // refresh
+                this.refreshEditLight();
+            } else if ($.editor.control === "light-new") {
+                let element = this.window.list.current();
+
+                if (typeof element === 'string') {
+                    if (element.toLocaleLowerCase() === "done") {
+                        $.editor.control = "light";
+                        $.editor.wedit = null;
+                        this._spriteset.addLight({
+                            kind: "sprite",
+                            texture: this.lightExample.children[0].texture,
+                            position: "center",
+                        }, "sprite " + String(this.light.element.length + 1), this._spriteset.sprite);
+                        this.refreshLightList();
+                        return;
+                    } else if (element.toLocaleLowerCase() === "return") {
+                        $.editor.control = "light";
+                        $.editor.wedit = null;
+                        this.refreshLightList();
+                        return;
+                    }
+                }
+
+                $.editor.wedit = null;
+
+                this.addLightExample(element)
+
+                this.window.list.activate()
+                this.window.list.open();
+                this.window.list.show();
+
+            } else if ($.editor.control === "collision") {
+                let element = this.gui.list.current()
+                if (typeof element === 'string') {
+                    if (element.toLocaleLowerCase() === "new polygon") {
+                        this.addCollision("polygon")
+                        this.gui.list.activate()
+                        this.refreshCollisionList();
+                    } else if (element.toLocaleLowerCase() === "new circle") {
+                        this.addCollision("circle")
+                        this.gui.list.activate()
+                        this.refreshCollisionList();
+                    } else if (element.toLocaleLowerCase() === "new rect") {
+                        this.addCollision("rect")
+                        this.gui.list.activate()
+                        this.refreshCollisionList();
+                    }
+                    return;
+                }
+
+                $.editor.control = "collision-edit";
+                $.editor.wedit = null;
+                $.editor.weditChange = false;
+                $.editor.target = element;
+                $.editor.kind = element._kind.toLowerCase();
+                // refresh
+                this.refreshEditor();
+
+                this.refreshEditCollision();
+            }
+        }
+
+        onColorPick() {
+            $.editor.target.color = this.gui.pallete.current();
+            $.editor.target.tint = $.editor.target.color;
+            this.gui.pallete.activate();
+            let color = Haya.Utils.Color.hexRgb(String($.editor.target.color).replace("0x", "#"));
+            $.editor.pallete.red = color.red;
+            $.editor.pallete.green = color.green;
+            $.editor.pallete.blue = color.blue;
+            this.gui.editor.button.color.sprite.text.style.fill = $.editor.target.color
+            this.gui.editor.button.color.text(`Color: ${$.editor.target.color}`);
+        }
+
+        wedit() {
+            if ($.editor.control.includes("light")) {
+                this.weditLight()
+            } else if ($.editor.control.includes("collision")) {
+                this.weditCollision()
+            } else if ($.editor.control.includes("particle")) {
+                this.weditParticle()
+            }
+        }
+
+        weditLight() {
+
+
+            if ($.editor.wedit === "position") {
+                // trigger
+                if (Input.isPressed('ok')) {
+                    $.editor.wedit = null;
+                }
+                // editing
+                if (TouchInput.isLongPressed()) { // isPressed
+                    $.editor.target.x = Haya.Mouse.x + this.display.x;
+                    $.editor.target.y = Haya.Mouse.y + this.display.y;
+                    //$.editor.weditChange = true;
+                    this.gui.editor.button.position.text(`Position: ${$.editor.target.x}, ${$.editor.target.y}`)
+                }
+            } else if ($.editor.wedit === "light-height") {
+                // edit
+                if (TouchInput.wheelY >= 20) {
+                    $.editor.target.lightHeight = Haya.DMath.fincrease($.editor.target.lightHeight, -5.0, 5.0, 0.01, "alt", 0.1);
+                    this.gui.editor.button.lightHeight.text(`Light Height: ${Haya.DMath.float($.editor.target.lightHeight)}`)
+                } else if (TouchInput.wheelY <= -20) {
+                    $.editor.target.lightHeight = Haya.DMath.fdecrease($.editor.target.lightHeight, -5.0, 5.0, 0.01, "alt", 0.1);
+                    this.gui.editor.button.lightHeight.text(`Light Height: ${Haya.DMath.float($.editor.target.lightHeight)}`)
+                }
+            } else if ($.editor.wedit === "brightness") {
+                // edit
+                if (TouchInput.wheelY >= 10) {
+                    $.editor.target.brightness = Haya.DMath.fincrease($.editor.target.brightness, 0.0, 10.0, 0.1, "alt", 1);
+                    this.gui.editor.button.brightness.text(`Brightness: ${Haya.DMath.float($.editor.target.brightness)}`)
+                } else if (TouchInput.wheelY <= -10) {
+                    $.editor.target.brightness = Haya.DMath.fdecrease($.editor.target.brightness, 0.0, 10.0, 0.1, "alt", 1);
+                    this.gui.editor.button.brightness.text(`Brightness: ${Haya.DMath.float($.editor.target.brightness)}`)
+                }
+            } else if ($.editor.wedit === "radius") {
+                // edit
+                if (TouchInput.wheelY >= 10) {
+                    $.editor.target.radius = Haya.DMath.fincrease($.editor.target.radius, 0.0, 1000, 5, "alt", 50);
+                    this.gui.editor.button.radius.text(`Radius: ${Haya.DMath.float($.editor.target.radius)}`)
+                } else if (TouchInput.wheelY <= -10) {
+                    $.editor.target.radius = Haya.DMath.fdecrease($.editor.target.radius, 0.0, 1000, 5, "alt", 50);
+                    this.gui.editor.button.radius.text(`Radius: ${Haya.DMath.float($.editor.target.radius)}`)
+                }
+            } else if ($.editor.wedit === "falloffa") {
+                // edit
+                if (TouchInput.wheelY >= 10) {
+                    $.editor.target.falloff[0] = Haya.DMath.fincrease($.editor.target.falloff[0], -10.0, 10.0, 0.1, "alt", 1.0);
+                    this.gui.editor.button.falloffA.text(`Falloff A: ${Haya.DMath.float($.editor.target.falloff[0])}`)
+                } else if (TouchInput.wheelY <= -10) {
+                    $.editor.target.falloff[0] = Haya.DMath.fdecrease($.editor.target.falloff[0], -10.0, 10.0, 0.1, "alt", 1.0);
+                    this.gui.editor.button.falloffA.text(`Falloff A: ${Haya.DMath.float($.editor.target.falloff[0])}`)
+                }
+            } else if ($.editor.wedit === "falloffb") {
+                // edit
+                if (TouchInput.wheelY >= 10) {
+                    $.editor.target.falloff[1] = Haya.DMath.fincrease($.editor.target.falloff[1], -10.0, 10.0, 0.1, "alt", 1.0);
+                    this.gui.editor.button.falloffB.text(`Falloff B: ${Haya.DMath.float($.editor.target.falloff[1])}`)
+                } else if (TouchInput.wheelY <= -10) {
+                    $.editor.target.falloff[1] = Haya.DMath.fdecrease($.editor.target.falloff[1], -10.0, 10.0, 0.1, "alt", 1.0);
+                    this.gui.editor.button.falloffB.text(`Falloff B: ${Haya.DMath.float($.editor.target.falloff[1])}`)
+                }
+            } else if ($.editor.wedit === "falloffc") {
+                // edit
+                if (TouchInput.wheelY >= 10) {
+                    $.editor.target.falloff[2] = Haya.DMath.fincrease($.editor.target.falloff[2], -10.0, 10.0, 0.1, "alt", 1.0);
+                    this.gui.editor.button.falloffC.text(`Falloff C: ${Haya.DMath.float($.editor.target.falloff[2])}`)
+                } else if (TouchInput.wheelY <= -10) {
+                    $.editor.target.falloff[2] = Haya.DMath.fdecrease($.editor.target.falloff[2], -10.0, 10.0, 0.1, "alt", 1.0);
+                    this.gui.editor.button.falloffC.text(`Falloff C: ${Haya.DMath.float($.editor.target.falloff[2])}`)
+                }
+            } else if ($.editor.wedit === "color") {
+                this.gui.pallete.visible = this.toolbar;
+                this.gui.pallete.update();
+            } else if ($.editor.wedit === "alpha") {
+                // edit
+                if (TouchInput.wheelY >= 10) {
+                    $.editor.target.alpha = Haya.DMath.fincrease($.editor.target.alpha, 0.0, 1.0, 0.01, "alt", 0.05);
+                    this.gui.editor.button.opacity.text(`Opacity: ${Haya.DMath.float($.editor.target.alpha * 100)}%`)
+                } else if (TouchInput.wheelY <= -10) {
+                    $.editor.target.alpha = Haya.DMath.fdecrease($.editor.target.alpha, 0.0, 1.0, 0.01, "alt", 0.05);
+                    this.gui.editor.button.opacity.text(`Opacity: ${Haya.DMath.float($.editor.target.alpha * 100)}%`)
+                }
+            } else if ($.editor.wedit === "switch") {
+                if (this.gui.editor.button.switch.sprite.input.visible === true) {
+                    this.gui.editor.button.switch.sprite.input.focus();
+                    if (/^(\d+)/gmi.test(this.gui.editor.button.switch.sprite.input.text.trim())) {
+                        $.editor.target._self.switch = Number(this.gui.editor.button.switch.sprite.input.text);
+                        this.gui.editor.button.switch.text(`Switch: ${$.editor.target._self.switch}`)
+                    }
+
+
+                }
+            } else if ($.editor.wedit === "scaleX") {
+                // edit
+                if (TouchInput.wheelY >= 10) {
+                    $.editor.target.scale.x = Haya.DMath.fincrease($.editor.target.scale.x, 0.0, 10.0, 0.1, "alt", 0.5);
+                    this.gui.editor.button.scaleX.text(`Scale X: ${Haya.DMath.float($.editor.target.scale.x)}`)
+                } else if (TouchInput.wheelY <= -10) {
+                    $.editor.target.scale.x = Haya.DMath.fdecrease($.editor.target.scale.x, 0.0, 10.0, 0.1, "alt", 0.5);
+                    this.gui.editor.button.scaleX.text(`Scale X: ${Haya.DMath.float($.editor.target.scale.x)}`)
+                }
+            } else if ($.editor.wedit === "scaleY") {
+                // edit
+                if (TouchInput.wheelY >= 10) {
+                    $.editor.target.scale.y = Haya.DMath.fincrease($.editor.target.scale.y, 0.0, 10.0, 0.1, "alt", 0.5);
+                    this.gui.editor.button.scaleY.text(`Scale Y: ${Haya.DMath.float($.editor.target.scale.y)}`)
+                } else if (TouchInput.wheelY <= -10) {
+                    $.editor.target.scale.y = Haya.DMath.fdecrease($.editor.target.scale.y, 0.0, 10.0, 0.1, "alt", 0.5);
+                    this.gui.editor.button.scaleY.text(`Scale Y: ${Haya.DMath.float($.editor.target.scale.y)}`)
+                }
+            } else if ($.editor.wedit === "anchorX") {
+                // edit
+                if (TouchInput.wheelY >= 20) {
+                    $.editor.target.anchor.x = Haya.DMath.fincrease($.editor.target.anchor.x, 0.0, 1.0, 0.1, "alt", 0.5);
+                    this.gui.editor.button.anchorX.text(`Anchor X: ${Haya.DMath.float($.editor.target.anchor.x)}`)
+                } else if (TouchInput.wheelY <= -20) {
+                    $.editor.target.anchor.x = Haya.DMath.fdecrease($.editor.target.anchor.x, 0.0, 1.0, 0.1, "alt", 0.5);
+                    this.gui.editor.button.anchorX.text(`Anchor X: ${Haya.DMath.float($.editor.target.anchor.x)}`)
+                }
+            } else if ($.editor.wedit === "anchorY") {
+                if (TouchInput.wheelY >= 20) {
+                    $.editor.target.anchor.y = Haya.DMath.fincrease($.editor.target.anchor.y, 0.0, 1.0, 0.1, "alt", 0.5);
+                    this.gui.editor.button.anchorY.text(`Anchor Y: ${Haya.DMath.float($.editor.target.anchor.y)}`)
+                } else if (TouchInput.wheelY <= -20) {
+                    $.editor.target.anchor.y = Haya.DMath.fdecrease($.editor.target.anchor.y, 0.0, 1.0, 0.1, "alt", 0.5);
+                    this.gui.editor.button.anchorY.text(`Anchor Y: ${Haya.DMath.float($.editor.target.anchor.y)}`)
+                }
+            } else if ($.editor.wedit === "rotation") {
+                if (TouchInput.wheelY >= 10) {
+                    // $.editor.target.rotation += 0.1;
+                    // $.editor.target.rotation = Haya.DMath.fclamp($.editor.target.rotation, -6.2, 6.2)
+                    $.editor.target.rotation = Haya.DMath.fincrease($.editor.target.rotation, -6.2, 6.2, 0.1, "alt", 0.5);
+                    this.gui.editor.button.rotation.text(`Rotation: ${Haya.DMath.float(Haya.DMath.degrees($.editor.target.rotation))}°`)
+                } else if (TouchInput.wheelY <= -10) {
+                    $.editor.target.rotation = Haya.DMath.fdecrease($.editor.target.rotation, -6.2, 6.2, 0.1, "alt", 0.5);
+                    this.gui.editor.button.rotation.text(`Rotation: ${Haya.DMath.float(Haya.DMath.degrees($.editor.target.rotation))}°`)
+                }
+            } else if ($.editor.wedit === "pulseSpeed") {
+                // edit
+                if (TouchInput.wheelY >= 10) {
+                    $.editor.target._self.pulse.speed = Haya.DMath.fincrease($.editor.target._self.pulse.speed, 0.0, 1, 0.05, "alt", 0.5);
+                    this.gui.editor.button.pulseSpeed.text(`Pulse Speed: ${Haya.DMath.float($.editor.target._self.pulse.speed)}`)
+                } else if (TouchInput.wheelY <= -10) {
+                    $.editor.target._self.pulse.speed = Haya.DMath.fdecrease($.editor.target._self.pulse.speed, 0.0, 1, 0.05, "alt", 0.5);
+                    this.gui.editor.button.pulseSpeed.text(`Pulse Speed: ${Haya.DMath.float($.editor.target._self.pulse.speed)}`)
+                }
+            } else if ($.editor.wedit === "pulseMin") {
+                // edit
+                if (TouchInput.wheelY >= 10) {
+                    $.editor.target._self.pulse.min = Haya.DMath.fincrease($.editor.target._self.pulse.min, 0.0, 10, 0.05, "alt", 0.5);
+                    this.gui.editor.button.pulseMin.text(`Pulse Minimun: ${Haya.DMath.float($.editor.target._self.pulse.min)}`)
+                } else if (TouchInput.wheelY <= -10) {
+                    $.editor.target._self.pulse.min = Haya.DMath.fdecrease($.editor.target._self.pulse.min, 0.0, 10, 0.05, "alt", 0.5);
+                    this.gui.editor.button.pulseMin.text(`Pulse Minimun: ${Haya.DMath.float($.editor.target._self.pulse.min)}`)
+                }
+            } else if ($.editor.wedit === "pulseMax") {
+                // edit
+                if (TouchInput.wheelY >= 10) {
+                    $.editor.target._self.pulse.max = Haya.DMath.fincrease($.editor.target._self.pulse.max, 0.0, 10, 0.05, "alt", 0.5);
+                    this.gui.editor.button.pulseMax.text(`Pulse Maximun: ${Haya.DMath.float($.editor.target._self.pulse.max)}`)
+                } else if (TouchInput.wheelY <= -10) {
+                    $.editor.target._self.pulse.max = Haya.DMath.fdecrease($.editor.target._self.pulse.max, 0.0, 10, 0.05, "alt", 0.5);
+                    this.gui.editor.button.pulseMax.text(`Pulse Maximun: ${Haya.DMath.float($.editor.target._self.pulse.max)}`)
+                }
+            } else if ($.editor.wedit === "pulseDuration") {
+                // edit
+                if (TouchInput.wheelY >= 10) {
+                    $.editor.target._self.pulse.duration = Haya.DMath.fincrease($.editor.target._self.pulse.duration, 0.1, 10, 0.1, "alt", 1);
+                    this.gui.editor.button.pulseDuration.text(`Pulse Duration: ${Haya.DMath.float($.editor.target._self.pulse.duration)}s`)
+                } else if (TouchInput.wheelY <= -10) {
+                    $.editor.target._self.pulse.duration = Haya.DMath.fdecrease($.editor.target._self.pulse.duration, 0.1, 10, 0.1, "alt", 1);
+                    this.gui.editor.button.pulseDuration.text(`Pulse Duration: ${Haya.DMath.float($.editor.target._self.pulse.duration)}s`)
+                }
+            } 
+
+            //
+
+
+        }
+
+        weditCollision() {
+            if ($.editor.wedit === "position") {
+                // trigger
+                if (Input.isPressed('ok')) {
+                    $.editor.wedit = null;
+                }
+                // editing
+                if (TouchInput.isLongPressed()) { // isPressed
+                    $.editor.target.x = Haya.Mouse.x + this.display.x;
+                    $.editor.target.y = Haya.Mouse.y + this.display.y;
+                    this.gui.editor.button.position.text(`Position: ${$.editor.target.x}, ${$.editor.target.y}`)
+                    $.editor.weditChange = true
+                } else if (Input.isPressed('down')) {
+                    $.editor.target.y += 1;
+                    this.gui.editor.button.position.text(`Position: ${$.editor.target.x}, ${$.editor.target.y}`)
+                    $.editor.weditChange = true
+                } else if (Input.isPressed('up')) {
+                    $.editor.target.y -= 1;
+                    this.gui.editor.button.position.text(`Position: ${$.editor.target.x}, ${$.editor.target.y}`)
+                    $.editor.weditChange = true
+                } else if (Input.isPressed('right')) {
+                    $.editor.target.x += 1;
+                    this.gui.editor.button.position.text(`Position: ${$.editor.target.x}, ${$.editor.target.y}`)
+                    $.editor.weditChange = true
+                } else if (Input.isPressed('left')) {
+                    $.editor.target.x -= 1;
+                    this.gui.editor.button.position.text(`Position: ${$.editor.target.x}, ${$.editor.target.y}`)
+                    $.editor.weditChange = true
+                }
+            } else if ($.editor.wedit === "radius") {
+                // edit
+                if (TouchInput.wheelY >= 10) {
+                    $.editor.target.radius = Haya.DMath.fincrease($.editor.target.radius, 0, 1000, 1, "alt", 10);
+                    this.gui.editor.button.radius.text(`Radius: ${$.editor.target.radius}`)
+                    $.editor.weditChange = true
+                } else if (TouchInput.wheelY <= -10) {
+                    $.editor.target.radius = Haya.DMath.fdecrease($.editor.target.radius, 0, 1000, 1, "alt", 10);
+                    this.gui.editor.button.radius.text(`Radius: ${$.editor.target.radius}`)
+                    $.editor.weditChange = true
+                }
+            } else if ($.editor.wedit === "scale") {
+                // edit
+                if (TouchInput.wheelY >= 10) {
+                    $.editor.target.scale = Haya.DMath.fincrease($.editor.target.scale, 0, 10.0, 0.1, "alt", 1.0);
+                    this.gui.editor.button.scale.text(`Scale: ${$.editor.target.scale}`)
+                    $.editor.weditChange = true
+                } else if (TouchInput.wheelY <= -10) {
+                    $.editor.target.scale = Haya.DMath.fdecrease($.editor.target.scale, 0, 10.0, 0.1, "alt", 1.0);
+                    this.gui.editor.button.scale.text(`Scale: ${$.editor.target.scale}`)
+                    $.editor.weditChange = true
+                }
+            } else if ($.editor.wedit === "padding") {
+                // edit
+                if (TouchInput.wheelY >= 10) {
+                    $.editor.target.padding = Haya.DMath.fincrease($.editor.target.padding, 0, 1000, 1, "alt", 10);
+                    this.gui.editor.button.padding.text(`Padding: ${Haya.DMath.float($.editor.target.padding)}`)
+                    $.editor.weditChange = true
+                } else if (TouchInput.wheelY <= -10) {
+                    $.editor.target.padding = Haya.DMath.fdecrease($.editor.target.padding, 0, 1000, 1, "alt", 10);
+                    this.gui.editor.button.padding.text(`Padding: ${Haya.DMath.float($.editor.target.padding)}`)
+                    $.editor.weditChange = true
+                }
+            } else if ($.editor.wedit === "angle") {
+                // edit
+                if (TouchInput.wheelY >= 10) {
+                    $.editor.target.angle = Haya.DMath.fincrease($.editor.target.angle, -6.2, 6.2, 0.1, "alt", 0.5);
+                    this.gui.editor.button.angle.text(`Angle: ${Haya.DMath.float(Haya.DMath.degrees($.editor.target.angle))}°`)
+                    $.editor.weditChange = true
+                } else if (TouchInput.wheelY <= -10) {
+                    $.editor.target.angle = Haya.DMath.fdecrease($.editor.target.angle, -6.2, 6.2, 0.1, "alt", 0.5);
+                    this.gui.editor.button.angle.text(`Angle: ${Haya.DMath.float(Haya.DMath.degrees($.editor.target.angle))}°`)
+                    $.editor.weditChange = true
+                }
+            } else if ($.editor.wedit === "scaleX") {
+                // edit
+                if (TouchInput.wheelY >= 10) {
+                    $.editor.target.scale_x = Haya.DMath.fincrease($.editor.target.scale_x, 0, 10.0, 0.05, "alt", 0.5);
+                    this.gui.editor.button.scaleX.text(`Scale X: ${$.editor.target.scale_x}`)
+                    $.editor.weditChange = true
+                } else if (TouchInput.wheelY <= -10) {
+                    $.editor.target.scale_x = Haya.DMath.fdecrease($.editor.target.scale_x, 0, 10.0, 0.05, "alt", 0.5);
+                    this.gui.editor.button.scaleX.text(`Scale X: ${$.editor.target.scale_x}`)
+                    $.editor.weditChange = true
+                }
+            } else if ($.editor.wedit === "scaleY") {
+                // edit
+                if (TouchInput.wheelY >= 10) {
+                    $.editor.target.scale_y = Haya.DMath.fincrease($.editor.target.scale_y, 0, 10.0, 0.05, "alt", 0.5);
+                    this.gui.editor.button.scaleY.text(`Scale Y: ${$.editor.target.scale_y}`)
+                    $.editor.weditChange = true
+                } else if (TouchInput.wheelY <= -10) {
+                    $.editor.target.scale_y = Haya.DMath.fdecrease($.editor.target.scale_y, 0, 10.0, 0.05, "alt", 0.5);
+                    this.gui.editor.button.scaleY.text(`Scale Y: ${$.editor.target.scale_y}`)
+                    $.editor.weditChange = true
+                }
+            } else if ($.editor.wedit === "scaleA") {
+                // edit
+                if (TouchInput.wheelY >= 10) {
+                    $.editor.target.scale_y = Haya.DMath.fincrease($.editor.target.scale_y, 0, 10.0, 0.05, "alt", 0.5);
+                    $.editor.target.scale_x = Haya.DMath.fincrease($.editor.target.scale_x, 0, 10.0, 0.05, "alt", 0.5);
+                    this.gui.editor.button.scaleY.text(`Scale Y: ${$.editor.target.scale_y}`)
+                    this.gui.editor.button.scaleX.text(`Scale X: ${$.editor.target.scale_x}`)
+                    this.gui.editor.button.scaleA.text(`Average Scale: ${Haya.DMath.float(($.editor.target.scale_y + $.editor.target.scale_x) / 2)}`)
+                    $.editor.weditChange = 10;
+                } else if (TouchInput.wheelY <= -10) {
+                    $.editor.target.scale_y = Haya.DMath.fdecrease($.editor.target.scale_y, 0, 10.0, 0.05, "alt", 0.5);
+                    $.editor.target.scale_x = Haya.DMath.fdecrease($.editor.target.scale_x, 0, 10.0, 0.05, "alt", 0.5);
+                    this.gui.editor.button.scaleY.text(`Scale Y: ${$.editor.target.scale_y}`)
+                    this.gui.editor.button.scaleX.text(`Scale X: ${$.editor.target.scale_x}`)
+                    this.gui.editor.button.scaleA.text(`Average Scale: ${Haya.DMath.float(($.editor.target.scale_y + $.editor.target.scale_x) / 2)}`)
+                    $.editor.weditChange = true
+                }
+            } else if ($.editor.wedit === "point") {
+                // trigger
+                if (Input.isPressed('ok')) {
+                    $.editor.wedit = null;
+                } else if (Input.isTriggered('d')) {
+                    let cachePoints = [];
+                    let toDelete = $.editor.target.cachePoints[$.editor.pointId]
+
+                    $.editor.target.cachePoints.forEach((points) => {
+                        if (points[0] === toDelete[0] && points[1] === toDelete[1]) {
+                            return;
+                        } else {
+                            cachePoints.push(points)
+                        }
+                    })
+
+                    $.editor.target.cachePoints = cachePoints;
+
+                    this.refreshEditCollision();
+
+                    $.editor.weditChange = true;
+
+
+
+                }
+
+
+
+
+                if (this.toolbar === false) {
+                    if (TouchInput.isPressed()) { // isPressed
+
+                        $.editor.target.cachePoints[$.editor.pointId][0] = (Haya.Mouse.x + this.display.x) - $.editor.target.x;
+                        $.editor.target.cachePoints[$.editor.pointId][1] = (Haya.Mouse.y + this.display.y) - $.editor.target.y;
+                        $.editor.weditChange = true
+                    }
+                }
+            } else if ($.editor.wedit === "floor") {
+                if (this.gui.editor.button.floor.sprite.input.visible === true) {
+                    this.gui.editor.button.floor.sprite.input.focus();
+                    if (this.gui.editor.button.floor.sprite.input.text.trim() !== "") {
+                        $.editor.target.floor = this.gui.editor.button.floor.sprite.input.text;
+                        this.gui.editor.button.floor.text(`Floor: ${$.editor.target.floor}`)
+                    }
+
+
+                }
+            }
+            // true
+            if ($.editor.weditChange) {
+                if ($.editor.wedit === "point") {
+                    $.editor.target.setPoints($.editor.target.cachePoints)
+                }
+                this.collisionGraphic($.editor.target)
+                $.editor.weditChange = false;
+            }
+        }
+
+        recursiveNewName(name, id) {
+            let text = `${name} #${id}`
+            if (this.collision.source.hasOwnProperty(text)) {
+                text = this.recursiveNewName(name, id + 1);
+                return text;
+            } else {
+                return text;
+            }
+        }
+
+        addCollision(kind) {
+            if (kind === "polygon") {
+                let name = this.recursiveNewName("polygon", this.collision.element.length + 1)
+                this.collision.source[name] = Haya.Collision.createCollision(
+                    $.collision, "polygon", {
+                        kind: "polygon",
+                        x: ((Graphics.width / 2) + this.display.x),
+                        y: ((Graphics.height / 2) + this.display.y),
+                        points: [
+                            [0, 0], [0, 100]
+                        ]
+                    }
+                )
+                this.collision.source[name]._name = name;
+                this.collision.source[name]._kind = kind;
+                this.collision.source[name]._graphic = new PIXI.Graphics();
+                this.graphicCollision.addChild(this.collision.source[name]._graphic);
+                this.collision.element.push(this.collision.source[name]);
+            } else if (kind === "circle") {
+                let name = this.recursiveNewName("circle", this.collision.element.length + 1)
+                this.collision.source[name] = Haya.Collision.createCollision(
+                    $.collision, "circle", {
+                        kind: "circle",
+                        x: ((Graphics.width / 2) + this.display.x),
+                        y: ((Graphics.height / 2) + this.display.y),
+                        radius: 16
+                    }
+                )
+                this.collision.source[name]._name = name;
+                this.collision.source[name]._kind = kind;
+                this.collision.source[name]._graphic = new PIXI.Graphics();
+                this.graphicCollision.addChild(this.collision.source[name]._graphic);
+                this.collision.element.push(this.collision.source[name]);
+
+            } else if (kind === "rect") {
+                let name = this.recursiveNewName("rect", this.collision.element.length + 1)
+                this.collision.source[name] = Haya.Collision.createCollision(
+                    $.collision, "rect", {
+                        kind: "rect",
+                        x: ((Graphics.width / 2) + this.display.x),
+                        y: ((Graphics.height / 2) + this.display.y),
+                        points: [60, 20]
+                    }
+                )
+                this.collision.source[name]._name = name;
+                this.collision.source[name]._kind = kind;
+                this.collision.source[name]._graphic = new PIXI.Graphics();
+                this.graphicCollision.addChild(this.collision.source[name]._graphic);
+                this.collision.element.push(this.collision.source[name]);
+            }
+
+        }
+        //
+        removeCollision(name) {
+            if (this.collision.source.hasOwnProperty(name)) {
+
+                let newElement = [];
+
+                this.collision.element.forEach((value, index) => {
+                    if (value._name === name) {
+                        this.collision.element.splice(index, 0)
+                        return;
+                    } else { newElement.push(value) }
+                })
+
+                this.collision.element = newElement;
+                this.graphicCollision.removeChild(this.collision.source[name]._graphic);
+                this.collision.source[name].remove();
+
+
+                delete this.collision.source[name];
+            }
+
+            print(this.collision, name);
+        }
+        // ===========================================================
+        refreshEditLight() {
+            // delete
+            this.refreshEditor();
+            //
+            $.editor.weditChange = false;
+            // get info
+            $.editor.target = this.gui.list.current().sprite;
+            $.time = Haya.Map.Time.isPeriod($.editor.target.time);
+            print($.editor.target)
+            // y
+            let yPos = 30;
+            // general
+            this.gui.editor.button.position = new Haya.GUI.Button({
+                text: `Position: ${$.editor.target.x}, ${$.editor.target.y}`,
+                position: [0, yPos],
+                action: () => { $.editor.wedit = "position"; },
+                width: 164
+            })
+
+            yPos += 30;
+            this.gui.editor.button.opacity = new Haya.GUI.Button({
+                text: `Opacity: ${Haya.DMath.float($.editor.target.alpha * 100)}%`,
+                position: [0, yPos],
+                action: () => { $.editor.wedit = "alpha"; },
+                width: 164
+            })
+
+            yPos += 30;
+            this.gui.editor.button.time = new Haya.GUI.Button({
+                text: `Time: ${$.editor.target.time}`,
+                position: [0, yPos],
+                action: function () {
+                    $.editor.wedit = null;
+                    $.time++;
+                    $.time = $.time > 4 ? 0 : $.time;
+                    $.editor.target.time = Haya.Map.Time.isPeriod($.time);
+                    print($.time, $.editor.target.time)
+                    this.text(`Time: ${$.editor.target.time}`)
+                    return;
+                },
+                width: 164
+            })
+
+            // color
+            let color = Haya.Utils.Color.hexRgb(String($.editor.target.color).replace("0x", "#"));
+            $.editor.pallete.red = color.red;
+            $.editor.pallete.green = color.green;
+            $.editor.pallete.blue = color.blue;
+
+
+
+            yPos += 30;
+            this.gui.editor.button.switch = new Haya.GUI.Button({
+                text: `Switch: ${$.editor.target._self.switch}`,
+                position: [0, yPos],
+                action: () => {
+                    $.editor.wedit = "switch";
+                    this.gui.editor.button.switch.sprite.input.visible = !this.gui.editor.button.switch.sprite.input.visible;
+                    this.gui.editor.button.switch.sprite.input.text = "";
+                },
+                callback: function () {
+                    this.sprite.input = new PixiTextInput(`${$.editor.target._self.switch}`);
+                    this.sprite.input.width = this.sprite.width;
+                    this.sprite.input.background = false;
+                    this.sprite.input.visible = false;
+                    this.sprite.input.alpha = 0;
+                    this.sprite.input.position.set(
+                        this.sprite.x,
+                        this.sprite.y
+                    )
+                    this.addChild(this.sprite.input)
+                },
+                width: 164
+            })
+
+            yPos += 30;
+            this.gui.editor.button.color = new Haya.GUI.Button({
+                text: `Color: ${$.editor.target.color}`,
+                position: [0, yPos],
+                action: () => {
+                    $.editor.wedit = $.editor.wedit === "color" ? null : "color";
+                    if ($.editor.wedit === null) {
+                        this.gui.pallete.hide();
+                        this.gui.pallete.deactivate();
+                        this.gui.pallete.close();
+                        return;
+                    }
+                    this.gui.pallete.show();
+                    this.gui.pallete.activate();
+                    this.gui.pallete.open();
+                    this.gui.pallete._index = 0;
+                },
+                callback: function () {
+                    this.sprite.text.style.fill = $.editor.target.color
+                    this.text(`Color: ${$.editor.target.color}`)
+                },
+                width: 164
+            })
+
+            // pixi
+            if ($.editor.target._self.kind !== "sprite") {
+
+                yPos += 30;
+                this.gui.editor.button.lightHeight = new Haya.GUI.Button({
+                    text: `Light Height: ${Haya.DMath.float($.editor.target.lightHeight)}`,
+                    position: [0, yPos],
+                    action: () => { $.editor.wedit = "light-height"; },
+                    width: 164
+                })
+
+                yPos += 30;
+                this.gui.editor.button.brightness = new Haya.GUI.Button({
+                    text: `Brightness: ${Haya.DMath.float($.editor.target.brightness)}`,
+                    position: [0, yPos],
+                    action: () => { $.editor.wedit = "brightness"; },
+                    width: 164
+                })
+
+                yPos += 30;
+                this.gui.editor.button.radius = new Haya.GUI.Button({
+                    text: `Radius: ${Haya.DMath.float($.editor.target.radius)}`,
+                    position: [0, yPos],
+                    action: () => { $.editor.wedit = "radius"; },
+                    width: 164
+                })
+
+                yPos += 30;
+                this.gui.editor.button.falloffA = new Haya.GUI.Button({
+                    text: `Falloff A: ${Haya.DMath.float($.editor.target.falloff[0])}`,
+                    position: [0, yPos],
+                    action: () => { $.editor.wedit = "falloffA"; },
+                    width: 164
+                })
+
+                yPos += 30;
+                this.gui.editor.button.falloffB = new Haya.GUI.Button({
+                    text: `Falloff B: ${Haya.DMath.float($.editor.target.falloff[1])}`,
+                    position: [0, yPos],
+                    action: () => { $.editor.wedit = "falloffB"; },
+                    width: 164
+                })
+
+                yPos += 30;
+                this.gui.editor.button.falloffC = new Haya.GUI.Button({
+                    text: `Falloff C: ${Haya.DMath.float($.editor.target.falloff[2])}`,
+                    position: [0, yPos],
+                    action: () => { $.editor.wedit = "falloffC"; },
+                    width: 164
+                })
+            } else {
+                yPos += 30;
+                this.gui.editor.button.blend = new Haya.GUI.Button({
+                    text: `Blend Mode: ${$.editor.blend.list[$.editor.target.blendMode][1]}`,
+                    position: [0, yPos],
+                    action: function () {
+                        $.editor.blend.kind++;
+                        $.editor.blend.kind = $.editor.blend.kind >= $.editor.blend.list.length ? 0 : $.editor.blend.kind;
+                        $.editor.target.blendMode = $.editor.blend.list[$.editor.blend.kind][0];
+                        this.text(`Blend Mode: ${$.editor.blend.list[$.editor.target.blendMode][1]}`)
+                    },
+                    width: 164
+                })
+
+                yPos += 30;
+                this.gui.editor.button.scaleX = new Haya.GUI.Button({
+                    text: `Scale X: ${Haya.DMath.float($.editor.target.scale.x)}`,
+                    position: [0, yPos],
+                    action: function () {
+                        $.editor.wedit = "scaleX"
+                    },
+                    width: 164
+                })
+
+                yPos += 30;
+                this.gui.editor.button.scaleY = new Haya.GUI.Button({
+                    text: `Scale Y: ${Haya.DMath.float($.editor.target.scale.y)}`,
+                    position: [0, yPos],
+                    action: function () {
+                        $.editor.wedit = "scaleY"
+                    },
+                    width: 164
+                })
+
+                yPos += 30;
+                this.gui.editor.button.anchorX = new Haya.GUI.Button({
+                    text: `Anchor X: ${Haya.DMath.float($.editor.target.anchor.x)}`,
+                    position: [0, yPos],
+                    action: function () {
+                        $.editor.wedit = "anchorX"
+                    },
+                    width: 164
+                })
+
+                yPos += 30;
+                this.gui.editor.button.anchorY = new Haya.GUI.Button({
+                    text: `Anchor Y: ${Haya.DMath.float($.editor.target.anchor.y)}`,
+                    position: [0, yPos],
+                    action: function () {
+                        $.editor.wedit = "anchorY"
+                    },
+                    width: 164
+                })
+
+                yPos += 30;
+                this.gui.editor.button.rotation = new Haya.GUI.Button({
+                    text: `Rotation: ${Haya.DMath.float(Haya.DMath.degrees($.editor.target.rotation))}°`,
+                    position: [0, yPos],
+                    action: function () {
+                        $.editor.wedit = "rotation"
+                    },
+                    width: 164
+                })
+            } //$.editor.blend.kind, $.editor.list[kind][blendmode, string]
+
+            yPos += 30;
+            this.gui.editor.button.pulse = new Haya.GUI.Button({
+                text: `Pulse: ${$.editor.target._self.pulse.value}`,
+                position: [0, yPos],
+                action: () => {
+                    $.editor.target._self.pulse.value = !$.editor.target._self.pulse.value;
+                    this.gui.editor.button.pulse.text(`Pulse: ${$.editor.target._self.pulse.value}`)
+                },
+                callback: function () {
+                },
+                width: 164
+            })
+
+            yPos += 30;
+            this.gui.editor.button.pulseSpeed = new Haya.GUI.Button({
+                text: `Pulse Speed: ${Haya.DMath.float($.editor.target._self.pulse.speed)}`,
+                position: [0, yPos],
+                action: () => {
+                    $.editor.wedit = "pulseSpeed"
+                    //$.editor.target._self.pulse.speed
+                },
+                callback: function () {
+                },
+                width: 164
+            })
+
+            yPos += 30;
+            this.gui.editor.button.pulseMin = new Haya.GUI.Button({
+                text: `Pulse Minimum: ${Haya.DMath.float($.editor.target._self.pulse.min)}`,
+                position: [0, yPos],
+                action: () => {
+                    $.editor.wedit = "pulseMin"
+                    //$.editor.target._self.pulse.speed
+                },
+                callback: function () {
+                },
+                width: 164
+            })
+
+            yPos += 30;
+            this.gui.editor.button.pulseMax = new Haya.GUI.Button({
+                text: `Pulse Maximun: ${Haya.DMath.float($.editor.target._self.pulse.max)}`,
+                position: [0, yPos],
+                action: () => {
+                    $.editor.wedit = "pulseMax"
+                    //$.editor.target._self.pulse.speed
+                },
+                callback: function () {
+                },
+                width: 164
+            })
+
+            //
+            yPos += 30;
+            this.gui.editor.button.pulseDuration = new Haya.GUI.Button({
+                text: `Pulse Duration: ${Haya.DMath.float($.editor.target._self.pulse.duration)}s`,
+                position: [0, yPos],
+                action: () => {
+                    $.editor.wedit = "pulseDuration"
+                    //$.editor.target._self.pulse.speed
+                },
+                callback: function () {
+                },
+                width: 164
+            })
+
+            yPos += 30;
+            this.gui.editor.button.delete = new Haya.GUI.Button({
+                text: `Delete!`,
+                position: [0, yPos],
+                action: () => {
+                    $.editor.wedit = null;
+                    this._spriteset.removeLight($.editor.target._self._name);
+                    $.editor.control = "light";
+                    this.refreshEditor();
+                    this.refreshLightList();
+                    return;
+                },
+                width: 164
+            })
+
+
+
+            Object.keys(this.gui.editor.button).map((bkey) => {
+                if (this.gui.editor.button[bkey]) {
+                    this.gui.editor.addChild(this.gui.editor.button[bkey]);
+                }
+            })
+        }
+
+        refreshEditCollision() {
+            // delete
+            this.refreshEditor();
+            //
+            $.editor.weditChange = false;
+            // y
+            let yPos = 50;
+            // general
+            this.gui.editor.button.position = new Haya.GUI.Button({
+                text: `Position: ${$.editor.target.x}, ${$.editor.target.y}`,
+                position: [0, yPos],
+                action: () => { $.editor.wedit = "position"; },
+                width: 164
+            })
+            // kind
+            if ($.editor.kind === "circle") {
+                yPos += 30;
+                this.gui.editor.button.radius = new Haya.GUI.Button({
+                    text: `Radius: ${$.editor.target.radius}`,
+                    position: [0, yPos],
+                    action: () => { $.editor.wedit = "radius"; },
+                    width: 164
+                })
+
+                yPos += 30;
+                this.gui.editor.button.scale = new Haya.GUI.Button({
+                    text: `Scale: ${Haya.DMath.float($.editor.target.scale)}`,
+                    position: [0, yPos],
+                    action: () => { $.editor.wedit = "scale"; },
+                    width: 164
+                })
+
+
+            } else if ($.editor.kind === "polygon") {
+                yPos += 30;
+                this.gui.editor.button.npoint = new Haya.GUI.Button({
+                    text: `New Point!`,
+                    position: [0, yPos],
+                    action: () => { $.editor.wedit = "npoint"; },
+                    width: 164
+                })
+
+
+                yPos += 30;
+                this.gui.editor.button.scaleX = new Haya.GUI.Button({
+                    text: `Scale X: ${Haya.DMath.float($.editor.target.scale_x)}`,
+                    position: [0, yPos],
+                    action: () => { $.editor.wedit = "scaleX"; },
+                    width: 164
+                })
+
+                yPos += 30;
+                this.gui.editor.button.scaleY = new Haya.GUI.Button({
+                    text: `Scale Y: ${Haya.DMath.float($.editor.target.scale_y)}`,
+                    position: [0, yPos],
+                    action: () => { $.editor.wedit = "scaleY"; },
+                    width: 164
+                })
+
+                // points
+                $.editor.target.cachePoints.forEach((points, index) => {
+                    this.gui.editor.button[`point ${index}`] = new Haya.GUI.Button({
+                        text: `Point #${index}: ${points[0]}, ${points[1]}`,
+                        position: [180, 50 + (30 * index)],
+                        action: function () {
+                            $.editor.pointId = this.setup.index;
+                            $.editor.wedit = "point";
+                        },
+                        width: 164,
+                        index: index
+                    })
+                })
+
+            } else if ($.editor.kind === "rect") {
+                //
+                yPos += 30;
+                this.gui.editor.button.scaleX = new Haya.GUI.Button({
+                    text: `Scale X: ${Haya.DMath.float($.editor.target.scale_x)}`,
+                    position: [0, yPos],
+                    action: () => { $.editor.wedit = "scaleX"; },
+                    width: 164
+                })
+
+                yPos += 30;
+                this.gui.editor.button.scaleY = new Haya.GUI.Button({
+                    text: `Scale Y: ${Haya.DMath.float($.editor.target.scale_y)}`,
+                    position: [0, yPos],
+                    action: () => { $.editor.wedit = "scaleY"; },
+                    width: 164
+                })
+
+                yPos += 30;
+                this.gui.editor.button.scaleA = new Haya.GUI.Button({
+                    text: `Average Scale: ${Haya.DMath.float(($.editor.target.scale_y + $.editor.target.scale_x) / 2)}`,
+                    position: [0, yPos],
+                    action: () => { $.editor.wedit = "scaleA"; },
+                    width: 164
+                })
+            }
+            yPos += 30;
+            this.gui.editor.button.padding = new Haya.GUI.Button({
+                text: `Padding: ${Haya.DMath.float($.editor.target.padding)}`,
+                position: [0, yPos],
+                action: () => { $.editor.wedit = "padding"; },
+                width: 164
+            })
+
+
+            if ($.editor.kind !== "circle") {
+                yPos += 30;
+                this.gui.editor.button.angle = new Haya.GUI.Button({
+                    text: `Angle: ${Haya.DMath.float(Haya.DMath.degrees($.editor.target.angle))}°`,
+                    position: [0, yPos],
+                    action: () => { $.editor.wedit = "angle"; },
+                    width: 164
+                })
+            }
+
+            yPos += 30;
+            this.gui.editor.button.floor = new Haya.GUI.Button({
+                text: `Floor: ${$.editor.target.floor}`,
+                position: [0, yPos],
+                action: () => {
+                    $.editor.wedit = "floor";
+                    this.gui.editor.button.floor.sprite.input.visible = !this.gui.editor.button.floor.sprite.input.visible;
+                    this.gui.editor.button.floor.sprite.input.text = "";
+                },
+                callback: function () {
+                    this.sprite.input = new PixiTextInput(`${$.editor.target.floor}`);
+                    this.sprite.input.width = this.sprite.width;
+                    this.sprite.input.background = false;
+                    this.sprite.input.visible = false;
+                    this.sprite.input.alpha = 0;
+                    this.sprite.input.position.set(
+                        this.sprite.x,
+                        this.sprite.y
+                    )
+                    this.addChild(this.sprite.input)
+                },
+                width: 164
+            })
+
+            yPos += 30;
+            this.gui.editor.button.delete = new Haya.GUI.Button({
+                text: `Delete!`,
+                position: [0, yPos],
+                action: () => {
+                    $.editor.wedit = null;
+                    $.editor.kind = null;
+                    $.editor.weditChange = false;
+                    this.removeCollision($.editor.target._name);
+                    $.editor.control = "collision";
+                    this.refreshEditor();
+                    this.refreshCollisionList();
+                },
+                width: 164
+            })
+
+
+
+            Object.keys(this.gui.editor.button).map((bkey) => {
+                if (this.gui.editor.button[bkey]) {
+                    if (Array.isArray(this.gui.editor.button[bkey])) {
+                        print(this.gui.editor.button[bkey])
+                        this.gui.editor.addChild(...this.gui.editor.button[bkey])
+                    } else {
+                        this.gui.editor.addChild(this.gui.editor.button[bkey])
+                    };
+                }
+            })
+
+        }
+
+    }
+    // ========================================================================
+    // SCENE TITLE JUMP OUT
+    Scene_Title.prototype.start = function () {
+        Scene_Base.prototype.start.call(this);
+        SceneManager.clearStack();
+        this.commandNewGame();
+        this.centerSprite(this._backSprite1);
+        this.centerSprite(this._backSprite2);
+        this.playTitleMusic();
+        this.startFadeIn(this.fadeSpeed(), false);
+
+    };
+    Haya.Map.scene = Scene_Editor;
+    // ========================================================================
+    print($, "Haya Map Editor")
+})(Haya.Map_Editor)
+
+/*
+ var gui = new dat.GUI();
+  gui.add(text, 'message');
+  gui.add(text, 'speed', -5, 5);
+  gui.add(text, 'displayOutline');
+  gui.add(text, 'explode');
+ */

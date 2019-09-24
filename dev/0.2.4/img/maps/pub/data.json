@@ -1,0 +1,36 @@
+{
+    "light": {
+        "ambient 9": {
+            "position": [
+                0,
+                0
+            ],
+            "switch": -1,
+            "color": "0x687014",
+            "nature": "static",
+            "dirty": 0,
+            "brightness": 0.6,
+            "falloff": [
+                0.75,
+                3,
+                20
+            ],
+            "name": "ambient 9",
+            "kind": "ambient",
+            "time": "all",
+            "blendMode": 1,
+            "lightHeight": 0.1,
+            "pivot": [
+                0,
+                0
+            ]
+        }
+    },
+    "collision": {},
+    "particle": {
+    },
+    "sound": {},
+    "name": "street",
+    "width": 1024,
+    "height": 864
+}

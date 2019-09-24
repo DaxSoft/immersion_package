@@ -1,0 +1,160 @@
+/* =============================================================================================================
+    Property of the element that holds all childs element
+=============================================================================================================  */
+#map_editor_stage {
+    z-index: 100 !important;
+    overflow: hidden;
+}
+
+#map_editor_stage>* {
+    z-index: 101;
+}
+
+/* =============================================================================================================
+    Property of the editor stage
+=============================================================================================================  */
+
+#editor_stage {
+    z-index: 505 !important;
+}
+
+#editor_stage>* {
+    z-index: inherit;
+}
+
+
+.overlay_stage {
+    position: fixed !important;
+    width: 0%;
+    height: 100%;
+    background-color: var(--color-neutral-black);
+    transition: all .3s ease-in;
+    top: 0;
+    left: 0;
+    overflow-x: hidden;
+}
+
+.overlay_open {
+    width: 100%;
+}
+
+
+/* =============================================================================================================
+    [:grid] 
+=============================================================================================================  */
+
+#iedit {
+    position: absolute;
+    left: 1em;
+    top: 1em;
+    z-index: 500 !important;
+    width: 24px;
+    object-fit: cover;
+    padding: .1em;
+    border-radius: 50%;
+    transform: all .3s ease;
+    cursor: pointer;
+}
+
+#iedit:hover {
+    background-color: var(--color-neutral-primary);
+}
+
+
+
+
+.editor {
+    position: absolute;
+    width: 30vw;
+    max-height: 90%;
+    z-index: 100;
+    display: grid;
+    grid-auto-columns: auto;
+    grid-auto-rows: auto;
+    grid-gap: 1em;
+    padding: 1em;
+    justify-content: center;
+    z-index: 505 !important;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    background-color: var(--color-neutral-black);
+}
+
+.editor>* {
+    z-index: inherit;
+}
+
+.circle-ball-color {
+    display: block;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+}
+
+
+.wcolor-list-edit {
+    display: grid;
+    grid-auto-columns: auto;
+    grid-auto-rows: auto;
+    grid-gap: 1rem;
+    grid-auto-flow: row;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    max-height: 256px;
+    padding: 1em;
+    border-radius: 6px;
+    background-color: var(--color-neutral-primary);
+}
+
+/* =============================================================================================================
+    IeditStage
+=============================================================================================================  */
+
+#layerControl {
+    display: grid;
+    position: absolute;
+    left: 5em;
+    top: 1em;
+    grid-template-columns: repeat(3, 32px);
+    grid-auto-rows: auto;
+    grid-auto-flow: column;
+    grid-gap: .5rem;
+    justify-content: center;
+}
+
+#layerControl>img {
+    display: block;
+    width: 28px;
+    object-fit: cover;
+    cursor: pointer;
+}
+
+#layerControl>img:hover {
+    animation: brightness-pingpong var(--animation-duration-normal) forwards ease-in;
+}
+
+
+#suitTools {
+    display: grid;
+    margin-top: 7em;
+    grid-template-columns: repeat(3, 96px);
+    grid-auto-rows: 64px;
+    grid-gap: 1rem;
+    padding: .5em;
+    justify-content: center;
+    justify-self: center;
+    justify-items: center;
+}
+
+.suitTools_block {
+    justify-content: center;
+    justify-self: center;
+    justify-items: center;
+}
+
+.suitTools_block>img {
+    display: block;
+    width: 28px;
+    object-fit: cover;
+    cursor: pointer;
+}

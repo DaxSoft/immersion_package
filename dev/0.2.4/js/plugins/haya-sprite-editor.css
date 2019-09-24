@@ -1,0 +1,84 @@
+/* =============================================================================================================
+    Property of the element that holds all childs element
+=============================================================================================================  */
+#stage {
+    z-index: 100 !important;
+    overflow: hidden;
+}
+
+#stage>* {
+    z-index: 101;
+}
+
+/* =============================================================================================================
+    Main Options
+=============================================================================================================  */
+
+#mainopt {
+    position: fixed;
+    width: 64px;
+    height: 99vh; 
+    overflow: hidden;
+    background-color: var(--color-neutral-primary);
+    padding: 1em;
+    left: 0;
+    top: -.5em;
+    display: grid;
+    grid-auto-columns: 64px;
+    grid-auto-rows: 64px;
+    grid-gap: 1rem;
+    justify-content: center;
+    justify-items: center;
+}
+
+.main_options {
+    cursor: pointer;
+    transition: all .3s ease;
+    justify-items: center;
+    justify-content: center;
+    justify-self: center;
+    display: grid;
+    grid-auto-rows: auto;
+}
+
+.main_options > img {
+    justify-self: center;
+    display: block;
+    min-width: 24px;
+    max-width: 24px;
+    object-fit: cover;
+}
+
+.main_options > label {
+    font-size: .65rem;
+}
+
+.main_options:hover {
+    animation: opacity-pingpong var(--animation-duration-long) infinite ease-in-out;
+}
+
+/* =============================================================================================================
+    Overall Editor
+=============================================================================================================  */
+.editor {
+    position: fixed;
+    width: 316px;
+    height: 99vh; 
+    overflow: hidden;
+    background-color: var(--color-neutral-primary);
+    left: 0;
+    top: -.5em;
+    display: grid;
+    grid-auto-columns: auto;
+    grid-auto-rows: max-content;
+    grid-gap: 1em;
+    padding: 1em;
+    justify-content: center;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+.editor > * {
+    justify-self: center;
+    margin: .5em;
+}

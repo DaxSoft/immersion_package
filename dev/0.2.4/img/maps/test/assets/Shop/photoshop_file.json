@@ -1,0 +1,232 @@
+{
+
+	"H_hTelha": {
+		"filename": "H_hTelha",
+		"blendMode": "BlendMode.NORMAL",
+		"x": 458,
+		"y": 50,
+		"width": 206,
+		"height": 285,
+		"opacity": 100
+	},
+
+	"M_hJanela": {
+		"filename": "M_hJanela",
+		"blendMode": "BlendMode.NORMAL",
+		"x": 576,
+		"y": 79,
+		"width": 30,
+		"height": 38,
+		"opacity": 100
+	},
+
+	"M_hEstante": {
+		"filename": "M_hEstante",
+		"blendMode": "BlendMode.NORMAL",
+		"x": 633,
+		"y": 143,
+		"width": 27,
+		"height": 120,
+		"opacity": 100
+	},
+
+	"M_hVendendor": {
+		"filename": "M_hVendendor",
+		"blendMode": "BlendMode.NORMAL",
+		"x": 464,
+		"y": 66,
+		"width": 95,
+		"height": 160,
+		"opacity": 100
+	},
+
+	"M_hLinkToB": {
+		"filename": "M_hLinkToB",
+		"blendMode": "BlendMode.NORMAL",
+		"x": 544,
+		"y": 259,
+		"width": 72,
+		"height": 80,
+		"opacity": 100
+	},
+
+	"M_hWall": {
+		"filename": "M_hWall",
+		"blendMode": "BlendMode.NORMAL",
+		"x": 464,
+		"y": 66,
+		"width": 192,
+		"height": 64,
+		"opacity": 100
+	},
+
+	"B_hOutside": {
+		"filename": "B_hOutside",
+		"blendMode": "BlendMode.NORMAL",
+		"x": 549,
+		"y": 76,
+		"width": 76,
+		"height": 41,
+		"opacity": 100
+	},
+
+	"G_hFloor": {
+		"filename": "G_hFloor",
+		"blendMode": "BlendMode.NORMAL",
+		"x": 464,
+		"y": 130,
+		"width": 192,
+		"height": 192,
+		"opacity": 100
+	},
+
+	"H_bRoof": {
+		"filename": "H_bRoof",
+		"blendMode": "BlendMode.NORMAL",
+		"x": 410,
+		"y": 303,
+		"width": 206,
+		"height": 285,
+		"opacity": 100
+	},
+
+	"M_benfeite": {
+		"filename": "M_benfeite",
+		"blendMode": "BlendMode.NORMAL",
+		"x": 478,
+		"y": 320,
+		"width": 67,
+		"height": 31,
+		"opacity": 100
+	},
+
+	"M_bluz1": {
+		"filename": "M_bluz1",
+		"blendMode": "BlendMode.NORMAL",
+		"x": 416,
+		"y": 352,
+		"width": 59,
+		"height": 88,
+		"opacity": 100
+	},
+
+	"M_bHigh": {
+		"filename": "M_bHigh",
+		"blendMode": "BlendMode.NORMAL",
+		"x": 552,
+		"y": 304,
+		"width": 56,
+		"height": 96,
+		"opacity": 100
+	},
+
+	"M_btoUnder": {
+		"filename": "M_btoUnder",
+		"blendMode": "BlendMode.NORMAL",
+		"x": 415,
+		"y": 508,
+		"width": 71,
+		"height": 64,
+		"opacity": 100
+	},
+
+	"M_bwall": {
+		"filename": "M_bwall",
+		"blendMode": "BlendMode.NORMAL",
+		"x": 416,
+		"y": 320,
+		"width": 192,
+		"height": 64,
+		"opacity": 100
+	},
+
+	"G_bfloor": {
+		"filename": "G_bfloor",
+		"blendMode": "BlendMode.NORMAL",
+		"x": 416,
+		"y": 384,
+		"width": 192,
+		"height": 192,
+		"opacity": 100
+	},
+
+	"SH_uTelha ": {
+		"filename": "SH_uTelha ",
+		"blendMode": "BlendMode.NORMAL",
+		"x": 240,
+		"y": 628,
+		"width": 344,
+		"height": 196,
+		"opacity": 100
+	},
+
+	"H_uLamapda": {
+		"filename": "H_uLamapda",
+		"blendMode": "BlendMode.NORMAL",
+		"x": 261,
+		"y": 656,
+		"width": 293,
+		"height": 42,
+		"opacity": 100
+	},
+
+	"M_uToBase": {
+		"filename": "M_uToBase",
+		"blendMode": "BlendMode.NORMAL",
+		"x": 424,
+		"y": 560,
+		"width": 55,
+		"height": 96,
+		"opacity": 100
+	},
+
+	"M_uItens": {
+		"filename": "M_uItens",
+		"blendMode": "BlendMode.NORMAL",
+		"x": 485,
+		"y": 649,
+		"width": 64,
+		"height": 77,
+		"opacity": 100
+	},
+
+	"M_uBau": {
+		"filename": "M_uBau",
+		"blendMode": "BlendMode.NORMAL",
+		"x": 368,
+		"y": 615,
+		"width": 67,
+		"height": 36,
+		"opacity": 100
+	},
+
+	"M_uVendedor": {
+		"filename": "M_uVendedor",
+		"blendMode": "BlendMode.NORMAL",
+		"x": 316,
+		"y": 677,
+		"width": 32,
+		"height": 106,
+		"opacity": 100
+	},
+
+	"M_uParede": {
+		"filename": "M_uParede",
+		"blendMode": "BlendMode.NORMAL",
+		"x": 272,
+		"y": 540,
+		"width": 312,
+		"height": 185,
+		"opacity": 100
+	},
+
+	"G_uTerra": {
+		"filename": "G_uTerra",
+		"blendMode": "BlendMode.NORMAL",
+		"x": 272,
+		"y": 610,
+		"width": 304,
+		"height": 198,
+		"opacity": 100
+	}
+}
